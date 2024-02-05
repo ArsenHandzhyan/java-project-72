@@ -47,3 +47,10 @@ bin/
 /gradle/wrapper/gradle-wrapper.jar
 /gradle/wrapper/gradle-wrapper.properties
 /.idea/uiDesigner.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/jte-classes/gg/jte/generated/ondemand/layout/JtepageGenerated.class
+/jte-classes/gg/jte/generated/ondemand/layout/JtepageGenerated.java
+/jte-classes/gg/jte/generated/ondemand/JteindexGenerated$1.class
+/jte-classes/gg/jte/generated/ondemand/JteindexGenerated$2.class
+/jte-classes/gg/jte/generated/ondemand/JteindexGenerated.class
+/jte-classes/gg/jte/generated/ondemand/JteindexGenerated.java
