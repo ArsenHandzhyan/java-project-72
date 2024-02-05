@@ -48,6 +48,14 @@ public class App {
 //        app.get(NamedRoutes.editCarPath("{id}"), CarController::edit);
 //        app.post(NamedRoutes.carPath("{id}"), CarController::update);
 //        app.get(NamedRoutes.deleteCarPath("{id}"), CarController::destroy);
+
+
+//        // Получаем значение переменной окружения PORT, если она установлена
+//        String portStr = System.getenv("PORT");
+//
+//        // Проверяем, установлена ли переменная окружения PORT
+//        // Если нет, используем значение по умолчанию (например, 7000)
+//        int port = (portStr != null && !portStr.isEmpty()) ? Integer.parseInt(portStr) : 8080;
         app.start(app.port());
     }
 
@@ -57,30 +65,23 @@ public class App {
         hikariConfig.setUsername("new_postgresql_for_javalin_user");
         hikariConfig.setPassword("GvGwspqIZhAYD3HDJjbP9QP51RSh5yf9");
 
-        var dataSource = new HikariDataSource(hikariConfig);
+        try (var dataSource = new HikariDataSource(hikariConfig)) {
+            // Получаем путь до файла в src/main/resources
+            var url = App.class.getClassLoader().getResource("schema.sql");
+            assert url != null;
 
-        // Получаем путь до файла в src/main/resources
-        var url = App.class.getClassLoader().getResource("schema.sql");
-        assert url != null;
+            try (var inputStream = url.openStream();
+                 var reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                var sql = reader.lines().collect(Collectors.joining("\n"));
 
-        try (var inputStream = url.openStream();
-             var reader = new BufferedReader(new InputStreamReader(inputStream))) {
-            var sql = reader.lines().collect(Collectors.joining("\n"));
-
-            // Оставьте остальную часть кода без изменений
-            try (var connection = dataSource.getConnection();
-                 var statement = connection.createStatement()) {
-                statement.execute(sql);
+                // Оставьте остальную часть кода без изменений
+                try (var connection = dataSource.getConnection();
+                     var statement = connection.createStatement()) {
+                    statement.execute(sql);
+                }
             }
+
+            return Javalin.create();
         }
-        // Получаем значение переменной окружения PORT, если она установлена
-        String portStr = System.getenv("PORT");
-
-        // Проверяем, установлена ли переменная окружения PORT
-        // Если нет, используем значение по умолчанию (например, 7000)
-        int port = (portStr != null && !portStr.isEmpty()) ? Integer.parseInt(portStr) : 7000;
-
-        // Создаем экземпляр Javalin, указывая порт
-        return Javalin.create();
     }
 }
