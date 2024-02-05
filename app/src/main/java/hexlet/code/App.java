@@ -2,6 +2,8 @@ package hexlet.code;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import hexlet.code.controller.MainController;
+import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
 
 import java.io.BufferedReader;
@@ -14,7 +16,7 @@ public class App {
 
     public static void main(String[] args) throws SQLException, IOException {
         var app = getApp();
-//        app.get(NamedRoutes.homePath(), MainController::index);
+        app.get(NamedRoutes.homePath(), MainController::index);
 //        app.get(NamedRoutes.usersPath(), UsersController::index);
 //        app.get(NamedRoutes.buildUserPath(), UsersController::build);
 //        app.get(NamedRoutes.userPath("{id}"), UsersController::show);
@@ -46,7 +48,7 @@ public class App {
 //        app.get(NamedRoutes.editCarPath("{id}"), CarController::edit);
 //        app.post(NamedRoutes.carPath("{id}"), CarController::update);
 //        app.get(NamedRoutes.deleteCarPath("{id}"), CarController::destroy);
-//        app.start(7070);
+        app.start(app.port());
     }
 
     public static Javalin getApp() throws SQLException, IOException {
@@ -61,7 +63,6 @@ public class App {
         var url = App.class.getClassLoader().getResource("schema.sql");
         assert url != null;
 
-        // Используем try-with-resources для автоматического закрытия Stream
         try (var inputStream = url.openStream();
              var reader = new BufferedReader(new InputStreamReader(inputStream))) {
             var sql = reader.lines().collect(Collectors.joining("\n"));
@@ -72,8 +73,14 @@ public class App {
                 statement.execute(sql);
             }
         }
+        // Получаем значение переменной окружения PORT, если она установлена
+        String portStr = System.getenv("PORT");
 
-//        BaseRepository.dataSource = dataSource;
-        return Javalin.create(config -> config.plugins.enableDevLogging());
+        // Проверяем, установлена ли переменная окружения PORT
+        // Если нет, используем значение по умолчанию (например, 7000)
+        int port = (portStr != null && !portStr.isEmpty()) ? Integer.parseInt(portStr) : 7000;
+
+        // Создаем экземпляр Javalin, указывая порт
+        return Javalin.create();
     }
 }
