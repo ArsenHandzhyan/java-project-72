@@ -46,3 +46,4 @@ bin/
 /.idea/vcs.xml
 /gradle/wrapper/gradle-wrapper.jar
 /gradle/wrapper/gradle-wrapper.properties
+/.idea/uiDesigner.xml
