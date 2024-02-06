@@ -5,12 +5,17 @@ import com.zaxxer.hikari.HikariDataSource;
 import hexlet.code.controller.MainController;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
+import io.javalin.rendering.template.JavalinJte;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
+
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import gg.jte.resolve.ResourceCodeResolver;
 
 public class App {
 
@@ -60,7 +65,10 @@ public class App {
     }
 
     public static Javalin getApp() throws SQLException, IOException {
-        String jdbcUrl = System.getenv("jdbc:postgresql://dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres.render.com/new_postgresql_for_javalin");
+        JavalinJte.init(createTemplateEngine());
+        String jdbcUrl = System.getenv("jdbc:postgresql:"
+                + "//dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres"
+                + ".render.com/new_postgresql_for_javalin");
         HikariConfig hikariConfig = new HikariConfig();
 
         if (jdbcUrl != null && !jdbcUrl.isEmpty()) {
@@ -90,5 +98,11 @@ public class App {
 
             return Javalin.create();
         }
+    }
+
+    private static TemplateEngine createTemplateEngine() {
+        ClassLoader classLoader = App.class.getClassLoader();
+        ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates.jte", classLoader);
+        return TemplateEngine.create(codeResolver, ContentType.Html);
     }
 }
