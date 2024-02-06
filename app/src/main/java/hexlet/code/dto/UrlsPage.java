@@ -2,11 +2,14 @@ package hexlet.code.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import hexlet.code.model.Url;
+
+import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public class MainPage extends BasePage {
-    private String currentUrl;
+public class UrlsPage extends BasePage {
+    private List<Url> urls;
 
     @Override
     public String getFlash() {

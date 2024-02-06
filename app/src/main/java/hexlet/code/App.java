@@ -22,37 +22,20 @@ public class App {
     public static void main(String[] args) throws SQLException, IOException {
         var app = getApp();
         app.get(NamedRoutes.homePath(), MainController::index);
-//        app.get(NamedRoutes.usersPath(), UsersController::index);
-//        app.get(NamedRoutes.buildUserPath(), UsersController::build);
-//        app.get(NamedRoutes.userPath("{id}"), UsersController::show);
-//        app.post(NamedRoutes.usersPath(), UsersController::create);
-//        app.get(NamedRoutes.editUserPath("{id}"), UsersController::edit);
-//        app.patch(NamedRoutes.userPath("{id}"), UsersController::update);
-//        app.delete(NamedRoutes.userPath("{id}"), UsersController::destroy);
-//
-//        app.get(NamedRoutes.coursesPath(), CoursesController::index);
-//        app.get(NamedRoutes.buildCoursePath(), CoursesController::build);
-//        app.get(NamedRoutes.coursePath("{id}"), CoursesController::show);
-//        app.post(NamedRoutes.coursesPath(), CoursesController::create);
-//        app.get(NamedRoutes.editCoursePath("{id}"), CoursesController::edit);
-//        app.post(NamedRoutes.coursePath("{id}"), CoursesController::update);
-//        app.get(NamedRoutes.deleteCoursePath("{id}"), CoursesController::destroy);
-//
-//
+//        app.get(NamedRoutes.urlsPath(), UrlsController::index);
+//        app.get(NamedRoutes.buildUrlPath(), UrlsController::build);
+//        app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
+//        app.post(NamedRoutes.urlsPath(), UrlsController::create);
+//        app.get(NamedRoutes.editUrlPath("{id}"), UrlsController::edit);
+//        app.patch(NamedRoutes.urlPath("{id}"), UrlsController::update);
+//        app.delete(NamedRoutes.urlPath("{id}"), UrlsController::destroy);
+
 //        // Отображение формы логина
 //        app.get(NamedRoutes.buildSessionPath(), SessionsController::build);
 //// Процесс логина
 //        app.post(NamedRoutes.sessionsPath(), SessionsController::create);
 //// Процесс выхода из аккаунта
 //        app.delete(NamedRoutes.buildSessionPath(), SessionsController::destroy);
-//
-//        app.get(NamedRoutes.carsPath(), CarController::index);
-//        app.get(NamedRoutes.buildCarPath(), CarController::build);
-//        app.get(NamedRoutes.carPath("{id}"), CarController::show);
-//        app.post(NamedRoutes.carsPath(), CarController::create);
-//        app.get(NamedRoutes.editCarPath("{id}"), CarController::edit);
-//        app.post(NamedRoutes.carPath("{id}"), CarController::update);
-//        app.get(NamedRoutes.deleteCarPath("{id}"), CarController::destroy);
 
 
 //        // Получаем значение переменной окружения PORT, если она установлена
