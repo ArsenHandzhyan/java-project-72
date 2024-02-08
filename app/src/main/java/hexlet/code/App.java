@@ -2,6 +2,8 @@ package hexlet.code;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import hexlet.code.controller.MainController;
+import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
 
 import java.io.BufferedReader;
@@ -14,7 +16,7 @@ public class App {
 
     public static void main(String[] args) throws SQLException, IOException {
         var app = getApp();
-//        app.get(NamedRoutes.homePath(), MainController::index);
+        app.get(NamedRoutes.homePath(), MainController::index);
 //        app.get(NamedRoutes.usersPath(), UsersController::index);
 //        app.get(NamedRoutes.buildUserPath(), UsersController::build);
 //        app.get(NamedRoutes.userPath("{id}"), UsersController::show);
@@ -46,34 +48,47 @@ public class App {
 //        app.get(NamedRoutes.editCarPath("{id}"), CarController::edit);
 //        app.post(NamedRoutes.carPath("{id}"), CarController::update);
 //        app.get(NamedRoutes.deleteCarPath("{id}"), CarController::destroy);
-//        app.start(7070);
+
+
+//        // Получаем значение переменной окружения PORT, если она установлена
+//        String portStr = System.getenv("PORT");
+//
+//        // Проверяем, установлена ли переменная окружения PORT
+//        // Если нет, используем значение по умолчанию (например, 8080)
+//        int port = (portStr != null && !portStr.isEmpty()) ? Integer.parseInt(portStr) : 8080;
+        app.start(app.port());
     }
 
     public static Javalin getApp() throws SQLException, IOException {
+        String jdbcUrl = System.getenv("jdbc:postgresql://dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres.render.com/new_postgresql_for_javalin");
         HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl("jdbc:postgresql://dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres.render.com/new_postgresql_for_javalin");
-        hikariConfig.setUsername("new_postgresql_for_javalin_user");
-        hikariConfig.setPassword("GvGwspqIZhAYD3HDJjbP9QP51RSh5yf9");
 
-        var dataSource = new HikariDataSource(hikariConfig);
-
-        // Получаем путь до файла в src/main/resources
-        var url = App.class.getClassLoader().getResource("schema.sql");
-        assert url != null;
-
-        // Используем try-with-resources для автоматического закрытия Stream
-        try (var inputStream = url.openStream();
-             var reader = new BufferedReader(new InputStreamReader(inputStream))) {
-            var sql = reader.lines().collect(Collectors.joining("\n"));
-
-            // Оставьте остальную часть кода без изменений
-            try (var connection = dataSource.getConnection();
-                 var statement = connection.createStatement()) {
-                statement.execute(sql);
-            }
+        if (jdbcUrl != null && !jdbcUrl.isEmpty()) {
+            hikariConfig.setJdbcUrl(jdbcUrl);
+        } else {
+            hikariConfig.setJdbcUrl("jdbc:h2:mem:project");
         }
 
-//        BaseRepository.dataSource = dataSource;
-        return Javalin.create(config -> config.plugins.enableDevLogging());
+        if (jdbcUrl == null || jdbcUrl.isEmpty()) {
+            hikariConfig.setUsername("new_postgresql_for_javalin_user");
+            hikariConfig.setPassword("GvGwspqIZhAYD3HDJjbP9QP51RSh5yf9");
+        }
+
+        try (var dataSource = new HikariDataSource(hikariConfig)) {
+            var url = App.class.getClassLoader().getResource("schema.sql");
+            assert url != null;
+
+            try (var inputStream = url.openStream();
+                 var reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                var sql = reader.lines().collect(Collectors.joining("\n"));
+
+                try (var connection = dataSource.getConnection();
+                     var statement = connection.createStatement()) {
+                    statement.execute(sql);
+                }
+            }
+
+            return Javalin.create();
+        }
     }
 }
