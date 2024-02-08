@@ -9,7 +9,7 @@ public class NamedRoutes {
     }
 
     public static String urlsPath() {
-        return "/urls";
+        return "/templates/jte/urls";
     }
 
     public static String urlPath(Long id) {
@@ -17,11 +17,11 @@ public class NamedRoutes {
     }
 
     public static String urlPath(String id) {
-        return "/urls/" + id;
+        return "/templates/jte/urls/" + id;
     }
 
     public static String buildUrlPath() {
-        return "/urls/build";
+        return "/templates/jte/urls/build";
     }
 
     public static String editUrlPath(Long id) {
@@ -29,6 +29,6 @@ public class NamedRoutes {
     }
 
     public static String editUrlPath(String id) {
-        return "/urls/" + id + "/edit";
+        return "/templates/jte/urls/" + id + "/edit";
     }
 }

@@ -9,6 +9,5 @@ public class MainController {
     public static void index(Context ctx) {
         var page = new MainPage(ctx.sessionAttribute("currentUrl"));
         ctx.render("index.jte", Collections.singletonMap("page", page));
-
     }
 }

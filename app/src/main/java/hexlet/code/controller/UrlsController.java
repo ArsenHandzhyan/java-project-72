@@ -23,7 +23,7 @@ public class UrlsController {
         var url = UrlsRepository.searchEntities(nameSearch, descriptionSearch);
         var page = new UrlsPage(url);
         page.setFlash((String) flash);
-        ctx.render("urls/index.jte", Collections.singletonMap("page", page));
+        ctx.render("templates/jte/urls/index.jte", Collections.singletonMap("page", page));
     }
 
     public static void show(Context ctx) throws SQLException {
@@ -33,11 +33,11 @@ public class UrlsController {
                 .orElseThrow(() -> new NotFoundResponse("Курс с id = " + id + " не существует"));
         var page = new UrlPage(url);
         page.setFlash(String.valueOf(flash));
-        ctx.render("urls/show.jte", Collections.singletonMap("page", page));
+        ctx.render("templates/jte/urls/show.jte", Collections.singletonMap("page", page));
     }
 
     public static void build(Context ctx) {
-        ctx.render("urls/build.jte");
+        ctx.render("templates/jte/urls/build.jte");
     }
 
     public static void create(Context ctx) throws SQLException {
@@ -57,7 +57,7 @@ public class UrlsController {
             var name = ctx.formParam("name");
             var createdAt = ctx.formParamAsClass("createdAt", LocalDateTime.class);
             var page = new BuildUrlPage(id, name, LocalDateTime.parse((CharSequence) createdAt), e.getErrors());
-            ctx.render("urls/build.jte", Collections.singletonMap("page", page));
+            ctx.render("templates/jte/urls/build.jte", Collections.singletonMap("page", page));
         }
     }
 
@@ -66,7 +66,7 @@ public class UrlsController {
         var url = UrlsRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Курс с id = " + id + " не существует"));
         var page = new UrlPage(url);
-        ctx.render("urls/edit.jte", Collections.singletonMap("page", page));
+        ctx.render("templates/jte/urls/edit.jte", Collections.singletonMap("page", page));
     }
 
     public static void update(Context ctx) throws SQLException {

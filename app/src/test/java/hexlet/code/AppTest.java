@@ -2,21 +2,13 @@ package hexlet.code;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import io.javalin.Javalin;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class AppTest {
-
-    @BeforeEach
-    public void setUp() throws Exception {
-        Javalin app = App.getApp();
-        app.start(0); // Запускаем сервер на случайном порту
-    }
 
     @Test
     void testH2Connection() throws SQLException {

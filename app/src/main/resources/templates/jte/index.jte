@@ -5,38 +5,31 @@
 
 @template.layout.page(
 content = @`
-    <!DOCTYPE html>
-    <html lang="ru">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Привет Hexlet!</title>
-    </head>
     <body>
-    <main>
-        <div>
-            <p><a href="${NamedRoutes.buildSessionPath()}">Войти</a></p>
+    <h1>Добавить адрес</h1>
+    <form action=${NamedRoutes.homePath()} method="POST">
+        <label for="url">Введите адрес:</label>
+        <input type="text" id="url" name="url" required>
+        <button type="submit">Добавить</button>
+    </form>
+
+    <!-- Отображение flash-сообщений -->
+    <div>
+        <!-- Сообщение об успешном добавлении адреса -->
+        <% if (ctx.attribute("success") != null) { %>
+        <div class="alert alert-success" role="alert">
+            <%= ctx.attribute("success") %>
         </div>
-        <div>
-            <p><a href="${NamedRoutes.carsPath()}">Страница Автомобилей</a></p>
+        <% } %>
+
+        <!-- Сообщение об ошибке (некорректный URL или уже существующий адрес) -->
+        <% if (ctx.attribute("error") != null) { %>
+        <div class="alert alert-danger" role="alert">
+            <%= ctx.attribute("error") %>
         </div>
-        <div>
-            <p><a href="${NamedRoutes.coursesPath()}">Страница Курсов</a></p>
-        </div>
-        <div>
-            <p><a href="${NamedRoutes.usersPath()}">Страница Пользователей</a></p>
-        </div>
-        <h1>Привет, Хекслет!</h1>
-        @if(page.getCurrentUser() != null)
-            Добро пожаловать, ${page.getCurrentUser()}.
-            Чтобы разлогиниться, удалите куку JSESSIONID из браузера
-            <div>
-                <p><a href="${NamedRoutes.sessionsPath()}">Выйти</a></p>
-            </div>
-        @endif
-    </main>
+        <% } %>
+    </div>
     </body>
-    </html>
 `,
 footer = @`
     <p><a href="https://github.com/ArsenHandzhyan">github аккаунт</a></p>
