@@ -3,9 +3,6 @@ package hexlet.code;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.javalin.Javalin;
-import hexlet.code.controller.MainController;
-import hexlet.code.repository.BaseRepository;
-import hexlet.code.util.NamedRoutes;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +14,7 @@ public class App {
 
     public static void main(String[] args) throws SQLException, IOException {
         var app = getApp();
-        app.get(NamedRoutes.homePath(), MainController::index);
+//        app.get(NamedRoutes.homePath(), MainController::index);
 //        app.get(NamedRoutes.usersPath(), UsersController::index);
 //        app.get(NamedRoutes.buildUserPath(), UsersController::build);
 //        app.get(NamedRoutes.userPath("{id}"), UsersController::show);
@@ -49,7 +46,7 @@ public class App {
 //        app.get(NamedRoutes.editCarPath("{id}"), CarController::edit);
 //        app.post(NamedRoutes.carPath("{id}"), CarController::update);
 //        app.get(NamedRoutes.deleteCarPath("{id}"), CarController::destroy);
-        app.start(7070);
+//        app.start(7070);
     }
 
     public static Javalin getApp() throws SQLException, IOException {
@@ -76,7 +73,7 @@ public class App {
             }
         }
 
-        BaseRepository.dataSource = dataSource;
+//        BaseRepository.dataSource = dataSource;
         return Javalin.create(config -> config.plugins.enableDevLogging());
     }
 }
