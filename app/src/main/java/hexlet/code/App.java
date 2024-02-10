@@ -3,6 +3,8 @@ package hexlet.code;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import hexlet.code.controller.MainController;
+import hexlet.code.controller.UrlsController;
+import hexlet.code.repository.BaseRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
 
@@ -12,54 +14,31 @@ import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
 
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import gg.jte.resolve.ResourceCodeResolver;
+import io.javalin.rendering.template.JavalinJte;
+
 public class App {
 
     public static void main(String[] args) throws SQLException, IOException {
+        BaseRepository.dataSource = initializeDataSource();
         var app = getApp();
+
         app.get(NamedRoutes.homePath(), MainController::index);
-//        app.get(NamedRoutes.usersPath(), UsersController::index);
-//        app.get(NamedRoutes.buildUserPath(), UsersController::build);
-//        app.get(NamedRoutes.userPath("{id}"), UsersController::show);
-//        app.post(NamedRoutes.usersPath(), UsersController::create);
-//        app.get(NamedRoutes.editUserPath("{id}"), UsersController::edit);
-//        app.patch(NamedRoutes.userPath("{id}"), UsersController::update);
-//        app.delete(NamedRoutes.userPath("{id}"), UsersController::destroy);
-//
-//        app.get(NamedRoutes.coursesPath(), CoursesController::index);
-//        app.get(NamedRoutes.buildCoursePath(), CoursesController::build);
-//        app.get(NamedRoutes.coursePath("{id}"), CoursesController::show);
-//        app.post(NamedRoutes.coursesPath(), CoursesController::create);
-//        app.get(NamedRoutes.editCoursePath("{id}"), CoursesController::edit);
-//        app.post(NamedRoutes.coursePath("{id}"), CoursesController::update);
-//        app.get(NamedRoutes.deleteCoursePath("{id}"), CoursesController::destroy);
-//
-//
-//        // Отображение формы логина
-//        app.get(NamedRoutes.buildSessionPath(), SessionsController::build);
-//// Процесс логина
-//        app.post(NamedRoutes.sessionsPath(), SessionsController::create);
-//// Процесс выхода из аккаунта
-//        app.delete(NamedRoutes.buildSessionPath(), SessionsController::destroy);
-//
-//        app.get(NamedRoutes.carsPath(), CarController::index);
-//        app.get(NamedRoutes.buildCarPath(), CarController::build);
-//        app.get(NamedRoutes.carPath("{id}"), CarController::show);
-//        app.post(NamedRoutes.carsPath(), CarController::create);
-//        app.get(NamedRoutes.editCarPath("{id}"), CarController::edit);
-//        app.post(NamedRoutes.carPath("{id}"), CarController::update);
-//        app.get(NamedRoutes.deleteCarPath("{id}"), CarController::destroy);
+        app.post(NamedRoutes.homePath(), MainController::addUrl);
+        app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
+        app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
 
-
-//        // Получаем значение переменной окружения PORT, если она установлена
-//        String portStr = System.getenv("PORT");
-//
-//        // Проверяем, установлена ли переменная окружения PORT
-//        // Если нет, используем значение по умолчанию (например, 8080)
-//        int port = (portStr != null && !portStr.isEmpty()) ? Integer.parseInt(portStr) : 8080;
         app.start(app.port());
     }
 
-    public static Javalin getApp() throws SQLException, IOException {
+    public static Javalin getApp() {
+        JavalinJte.init(createTemplateEngine());
+        return Javalin.create();
+    }
+
+    private static HikariDataSource initializeDataSource() throws SQLException, IOException {
         String jdbcUrl = System.getenv("jdbc:postgresql://dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres.render.com/new_postgresql_for_javalin");
         HikariConfig hikariConfig = new HikariConfig();
 
@@ -87,8 +66,13 @@ public class App {
                     statement.execute(sql);
                 }
             }
-
-            return Javalin.create();
+            return dataSource;
         }
+    }
+
+    private static TemplateEngine createTemplateEngine() {
+        ClassLoader classLoader = App.class.getClassLoader();
+        ResourceCodeResolver codeResolver = new ResourceCodeResolver("jte", classLoader);
+        return TemplateEngine.create(codeResolver, ContentType.Html);
     }
 }
