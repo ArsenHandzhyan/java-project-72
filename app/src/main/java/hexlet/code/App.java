@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.util.stream.Collectors;
 
 public class App {
-    private static final Logger logger = LoggerFactory.getLogger(App.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) throws SQLException, IOException {
         BaseRepository.dataSource = initializeDataSource();
@@ -42,7 +42,9 @@ public class App {
     }
 
     private static HikariDataSource initializeDataSource() throws SQLException, IOException {
-        String jdbcUrl = System.getenv("jdbc:postgresql://dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres.render.com/new_postgresql_for_javalin");
+        String jdbcUrl = System.getenv("jdbc:postgresql://"
+                + "dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres.render.com"
+                + "/new_postgresql_for_javalin");
         HikariConfig hikariConfig = new HikariConfig();
 
         if (jdbcUrl != null && !jdbcUrl.isEmpty()) {
@@ -72,7 +74,7 @@ public class App {
             }
             return dataSource;
         } catch (SQLException e) {
-            logger.error("An error occurred while initializing data source", e);
+            LOGGER.error("An error occurred while initializing data source", e);
             throw e;
         }
     }
