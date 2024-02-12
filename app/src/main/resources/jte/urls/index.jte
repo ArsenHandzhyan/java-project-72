@@ -9,7 +9,7 @@ content = @`
     <body>
     <h1>Список добавленных URL</h1>
     <ul>
-        @if (page != null)
+        @if (page != null && !page.getUrls().isEmpty())
             @for(var url : page.getUrls())
                 <div>
                     <p><a href="${NamedRoutes.urlsPath()}/${url.getId()}">
@@ -18,11 +18,9 @@ content = @`
                 </div>
             @endfor
         @else
-            <div>
-                <p>Список пустой</p>
-            </div>
-            @endif
-            </ul>
+            <p>Список пустой!</p>
+        @endif
+    </ul>
     </body>
 `,
 footer = @`

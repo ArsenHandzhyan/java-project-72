@@ -13,6 +13,7 @@ content = @`
         <input type="text" id="url" name="url" required>
         <button type="submit">Добавить</button>
     </form>
+    <p><a href="${NamedRoutes.urlsPath()}">Список добавленных URL</a></p>
     </body>
 `,
 footer = @`
