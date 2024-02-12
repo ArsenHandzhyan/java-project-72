@@ -2,29 +2,35 @@ package hexlet.code;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import gg.jte.resolve.ResourceCodeResolver;
 import hexlet.code.controller.MainController;
 import hexlet.code.controller.UrlsController;
+import hexlet.code.model.Url;
 import hexlet.code.repository.BaseRepository;
+import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
+import io.javalin.rendering.template.JavalinJte;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
-import gg.jte.ContentType;
-import gg.jte.TemplateEngine;
-import gg.jte.resolve.ResourceCodeResolver;
-import io.javalin.rendering.template.JavalinJte;
-
 public class App {
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) throws SQLException, IOException {
         BaseRepository.dataSource = initializeDataSource();
         var app = getApp();
-
+        Url url = new Url("https://example.com", LocalDateTime.now());
+        UrlsRepository.save(url);
         app.get(NamedRoutes.homePath(), MainController::index);
         app.post(NamedRoutes.homePath(), MainController::addUrl);
         app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
@@ -53,7 +59,8 @@ public class App {
             hikariConfig.setPassword("GvGwspqIZhAYD3HDJjbP9QP51RSh5yf9");
         }
 
-        try (var dataSource = new HikariDataSource(hikariConfig)) {
+        try {
+            var dataSource = new HikariDataSource(hikariConfig);
             var url = App.class.getClassLoader().getResource("schema.sql");
             assert url != null;
 
@@ -67,6 +74,9 @@ public class App {
                 }
             }
             return dataSource;
+        } catch (SQLException e) {
+            logger.error("An error occurred while initializing data source", e);
+            throw e;
         }
     }
 

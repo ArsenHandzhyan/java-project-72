@@ -1,5 +1,7 @@
 package hexlet.code.controller;
 
+import hexlet.code.dto.MainPage;
+import hexlet.code.dto.UrlsPage;
 import hexlet.code.model.Url;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
@@ -7,10 +9,15 @@ import io.javalin.http.Context;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 public class MainController {
     public static void index(Context ctx) {
-        ctx.render("index.jte");
+        var flash = ctx.consumeSessionAttribute("flash");
+        var page = new MainPage(ctx.sessionAttribute("currentUser"));
+        page.setFlash((String) flash);
+        ctx.render("index.jte", Collections.singletonMap("page", page));
     }
 
     public static void addUrl(Context ctx) {
@@ -26,18 +33,26 @@ public class MainController {
 
             Url existingUrl = UrlsRepository.findUrlByUrl(domainWithProtocolAndPort).orElse(null);
             if (existingUrl != null) {
-                ctx.sessionAttribute("error", "Страница уже существует");
-                ctx.redirect(NamedRoutes.homePath());
+                ctx.sessionAttribute("flash", "Страница уже существует");
+//                ctx.sessionAttribute("flash", "Url uzhe sushestvuet");
+                ctx.redirect(NamedRoutes.urlsPath());
                 return;
             }
 
             Url url = new Url(domainWithProtocolAndPort, LocalDateTime.now());
             UrlsRepository.save(url);
-            ctx.sessionAttribute("success", "Страница успешно добавлена");
-            ctx.redirect(NamedRoutes.urlsPath());
+            ctx.sessionAttribute("flash", "Страница успешно добавлена");
+//            ctx.sessionAttribute("flash", "Url uspeshno dobavlen");
+            var flash = ctx.consumeSessionAttribute("flash");
+            List<Url> urls = UrlsRepository.getEntities();
+            ctx.attribute("urls", urls);
+            var page = new UrlsPage(urls);
+            page.setFlash((String) flash);
+            ctx.render("urls/index.jte", Collections.singletonMap("page", page));
         } catch (Exception e) {
-            ctx.sessionAttribute("error", "Некорректный URL");
-            ctx.redirect(NamedRoutes.urlsPath());
+            ctx.sessionAttribute("flash", "Некорректный URL");
+//            ctx.sessionAttribute("flash", "necorrectnii URL");
+            ctx.redirect(NamedRoutes.homePath());
         }
     }
 }

@@ -3,13 +3,10 @@ package hexlet.code.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import javax.naming.Context;
-
 @AllArgsConstructor
 @Getter
 public class MainPage extends BasePage {
-    private String currentUrl;
-    private Context ctx;
+    private String currentUser;
 
     @Override
     public String getFlash() {

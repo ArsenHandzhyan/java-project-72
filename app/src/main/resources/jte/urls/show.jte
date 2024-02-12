@@ -1,20 +1,20 @@
-@import hexlet.code.dto.UrlsPage
+@import hexlet.code.dto.UrlPage
 @import hexlet.code.util.NamedRoutes
 
-@param UrlsPage page
+@param UrlPage page
 
 @template.layout.page(
+page = page,
 content = @`
     <body>
     <h1>Просмотр URL</h1>
-    <% if (ctx.attribute("url") != null) { %>
-    <p>URL: <%= ctx.attribute("url").getUrl() %></p>
-    <% } else { %>
-    <p>URL не найден</p>
-    <% } %>
+    @if (page.getUrl() != null)
+        <div>${page.getUrl().toString()}</div>
+    @endif
     </body>
 `,
 footer = @`
-<p><a href="https://github.com/ArsenHandzhyan">github аккаунт</a></p>
+    <p><a href="${NamedRoutes.urlsPath()}">назад</a></p>
+    <p><a href="https://github.com/ArsenHandzhyan">github аккаунт</a></p>
 `
 )
