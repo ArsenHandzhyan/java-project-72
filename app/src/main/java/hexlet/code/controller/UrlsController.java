@@ -48,6 +48,8 @@ public class UrlsController {
             if (url != null) {
                 ctx.attribute("url", url);
                 var page = new UrlPage(url, urlChecks);
+                var flash = ctx.consumeSessionAttribute("flash");
+                page.setFlash((String) flash);
                 ctx.render("urls/show.jte", Collections.singletonMap("page", page));
             } else {
                 ctx.status(404);
@@ -78,21 +80,15 @@ public class UrlsController {
             if (url != null) {
                 HttpResponse<String> response;
                 try {
-                    // Send the request and get the response body as a string
                     response = Unirest.post(url.getName()).asString();
-
-                    // Get the response body as a string
                     String responseBody = response.getBody();
-
-                    // Parse the string into a Document object (e.g., if it's HTML)
                     Document document = Jsoup.parse(responseBody);
 
-                    // Get the necessary data from the document
                     String title = "title not found";
                     String h1 = "h1 not found";
                     String description = "description not found";
 
-                    if (response.getStatus() == 200) { // Check if the request was successful
+                    if (response.getStatus() == 200) {
                         title = document.title();
                         h1 = Objects.requireNonNull(document.select("h1").first()).text();
                         description = document.select("meta[name=description]").attr("content");
