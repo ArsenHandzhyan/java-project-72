@@ -71,30 +71,28 @@ public class UrlsController {
         }
     }
 
-    public static void checkUrl(Context ctx) throws SQLException {
+    public static void checkUrl(Context ctx) {
         var id = ctx.pathParamAsClass("id", Long.class).get();
-        List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(id);
         try {
             Url url = UrlsRepository.find(id).orElse(null);
             if (url != null) {
                 HttpResponse<String> response;
                 try {
-                    // Отправляем запрос и получаем тело ответа в виде строки
+                    // Send the request and get the response body as a string
                     response = Unirest.post(url.getName()).asString();
 
-                    // Получаем тело ответа в виде строки
+                    // Get the response body as a string
                     String responseBody = response.getBody();
 
-                    // Преобразуем строку в объект Document (например, если это HTML)
+                    // Parse the string into a Document object (e.g., if it's HTML)
                     Document document = Jsoup.parse(responseBody);
 
-                    // Получаем необходимые данные из документа
-
+                    // Get the necessary data from the document
                     String title = "title not found";
                     String h1 = "h1 not found";
                     String description = "description not found";
 
-                    if (response.getStatus() == 200) { // Проверяем успешность запроса
+                    if (response.getStatus() == 200) { // Check if the request was successful
                         title = document.title();
                         h1 = Objects.requireNonNull(document.select("h1").first()).text();
                         description = document.select("meta[name=description]").attr("content");
@@ -114,32 +112,21 @@ public class UrlsController {
                     UrlCheckRepository.save(urlCheck);
 
                     ctx.status(201);
-                    ctx.sessionAttribute("flash", "Проверка URL произошла успешно");
-                    var flash = ctx.consumeSessionAttribute("flash");
-                    var page = new UrlPage(url, urlChecks);
-                    page.setFlash((String) flash);
-                    ctx.render("urls/show.jte", Collections.singletonMap("page", page));
+                    ctx.sessionAttribute("flash", "URL successfully checked");
                 } catch (UnirestException e) {
                     ctx.status(500);
                     ctx.sessionAttribute("flash", "Failed to send HTTP request");
-                    var flash = ctx.consumeSessionAttribute("flash");
-                    var page = new UrlPage(url, urlChecks);
-                    page.setFlash((String) flash);
-                    ctx.render("urls/show.jte", Collections.singletonMap("page", page));
                 }
             } else {
                 ctx.status(404);
-                ctx.sessionAttribute("flash", "URL с указанным ID не найден");
+                ctx.sessionAttribute("flash", "URL with the specified ID not found");
                 ctx.redirect(NamedRoutes.urlsPath());
             }
         } catch (SQLException e) {
-            Url url = UrlsRepository.find(id).orElse(null);
             ctx.status(500);
-            ctx.sessionAttribute("flash", "Произошла ошибка при выполнении проверки URL");
-            var flash = ctx.consumeSessionAttribute("flash");
-            var page = new UrlPage(url, urlChecks);
-            page.setFlash((String) flash);
-            ctx.render("urls/show.jte", Collections.singletonMap("page", page));
+            ctx.sessionAttribute("flash", "An error occurred while checking the URL");
         }
+
+        ctx.redirect(NamedRoutes.urlPath(id));
     }
 }

@@ -1,6 +1,5 @@
 @import hexlet.code.dto.UrlPage
 @import hexlet.code.util.NamedRoutes
-@import java.time.LocalDateTime
 
 @param UrlPage page
 
@@ -53,14 +52,14 @@ content = @`
             </thead>
             <tbody>
             @if (page.getUrlChecks() != null)
-                @for(var check : page.getUrlChecks())
+                @for(var index = page.getUrlChecks().size() - 1; index >= 0; index--)
                     <tr>
-                        <td>${check.getId()}</td>
-                        <td>${check.getStatusCode()}</td>
-                        <td>${check.getTitle()}</td>
-                        <td>${check.getH1()}</td>
-                        <td>${check.getDescription()}</td>
-                        <td>${LocalDateTime.now().toString()}</td>
+                        <td>${index + 1}</td>
+                        <td>${page.getUrlChecks().get(index).getStatusCode()}</td>
+                        <td>${page.getUrlChecks().get(index).getTitle()}</td>
+                        <td>${page.getUrlChecks().get(index).getH1()}</td>
+                        <td>${page.getUrlChecks().get(index).getDescription()}</td>
+                        <td>${page.getUrlChecks().get(index).getCreatedAt().toString()}</td>
                     </tr>
                 @endfor
             @endif
