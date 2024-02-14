@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import static hexlet.code.repository.BaseRepository.dataSource;
 
-public class UrlsRepository extends UrlHelper{
+public class UrlsRepository extends UrlHelper {
     public static void save(Url url) throws SQLException {
         String sql = "INSERT INTO urls (name) VALUES (?)";
         try (var conn = dataSource.getConnection();

@@ -24,11 +24,11 @@ public class NamedRoutes {
         return "/urls";
     }
 
-    public static String editUrlPath(Long id) {
-        return editUrlPath(String.valueOf(id));
+    public static String checksUrlPath(Long id) {
+        return checksUrlPath(String.valueOf(id));
     }
 
-    public static String editUrlPath(String id) {
-        return "/urls/" + id + "/edit";
+    public static String checksUrlPath(String id) {
+        return "/urls/" + id + "/checks";
     }
 }

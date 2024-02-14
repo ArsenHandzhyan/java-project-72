@@ -34,7 +34,6 @@ public class MainController {
             Url existingUrl = UrlsRepository.findUrlByUrl(domainWithProtocolAndPort).orElse(null);
             if (existingUrl != null) {
                 ctx.sessionAttribute("flash", "Страница уже существует");
-//                ctx.sessionAttribute("flash", "Url uzhe sushestvuet");
                 ctx.redirect(NamedRoutes.urlsPath());
                 return;
             }
@@ -42,7 +41,6 @@ public class MainController {
             Url url = new Url(domainWithProtocolAndPort, LocalDateTime.now());
             UrlsRepository.save(url);
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
-//            ctx.sessionAttribute("flash", "Url uspeshno dobavlen");
             var flash = ctx.consumeSessionAttribute("flash");
             List<Url> urls = UrlsRepository.getEntities();
             ctx.attribute("urls", urls);
@@ -51,7 +49,6 @@ public class MainController {
             ctx.render("urls/index.jte", Collections.singletonMap("page", page));
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
-//            ctx.sessionAttribute("flash", "necorrectnii URL");
             ctx.redirect(NamedRoutes.homePath());
         }
     }
