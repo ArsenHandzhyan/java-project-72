@@ -7,9 +7,7 @@ import gg.jte.TemplateEngine;
 import gg.jte.resolve.ResourceCodeResolver;
 import hexlet.code.controller.MainController;
 import hexlet.code.controller.UrlsController;
-import hexlet.code.model.Url;
 import hexlet.code.repository.BaseRepository;
-import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinJte;
@@ -20,23 +18,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 public class App {
-    private static final Logger logger = LoggerFactory.getLogger(App.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) throws SQLException, IOException {
         BaseRepository.dataSource = initializeDataSource();
         var app = getApp();
-
-        Url url = new Url("https://example.com", LocalDateTime.now());
-        UrlsRepository.save(url);
+//        Url url = new Url("https://example.com", LocalDateTime.now());
+//        UrlsRepository.save(url);
         app.get(NamedRoutes.homePath(), MainController::index);
         app.post(NamedRoutes.homePath(), MainController::addUrl);
         app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
-        app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
 
         app.start(app.port());
     }
@@ -47,7 +42,9 @@ public class App {
     }
 
     private static HikariDataSource initializeDataSource() throws SQLException, IOException {
-        String jdbcUrl = System.getenv("JDBC_DATABASE_URL");
+        String jdbcUrl = System.getenv("jdbc:postgresql://"
+                + "dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres.render.com"
+                + "/new_postgresql_for_javalin");
         HikariConfig hikariConfig = new HikariConfig();
 
         if (jdbcUrl != null && !jdbcUrl.isEmpty()) {
@@ -77,7 +74,7 @@ public class App {
             }
             return dataSource;
         } catch (SQLException e) {
-            logger.error("An error occurred while initializing data source", e);
+            LOGGER.error("An error occurred while initializing data source", e);
             throw e;
         }
     }
