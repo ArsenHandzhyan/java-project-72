@@ -3,12 +3,15 @@ package hexlet.code.controller;
 import hexlet.code.dto.MainPage;
 import hexlet.code.dto.UrlsPage;
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
+import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,8 +46,14 @@ public class MainController {
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
             var flash = ctx.consumeSessionAttribute("flash");
             List<Url> urls = UrlsRepository.getEntities();
+            List<UrlCheck> urlChecks = new ArrayList<>();
+            // Populate urlChecks for each Url
+            for (Url url1 : urls) {
+                List<UrlCheck> checksForUrl = UrlCheckRepository.findByUrlId(url1.getId());
+                urlChecks.addAll(checksForUrl);
+            }
             ctx.attribute("urls", urls);
-            var page = new UrlsPage(urls);
+            var page = new UrlsPage(urls, urlChecks);
             page.setFlash((String) flash);
             ctx.render("urls/index.jte", Collections.singletonMap("page", page));
         } catch (Exception e) {

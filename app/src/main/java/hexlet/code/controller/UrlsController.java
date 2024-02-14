@@ -9,21 +9,29 @@ import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 import kong.unirest.core.HttpResponse;
-import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class UrlsController {
     public static void showAllUrls(Context ctx) {
         try {
             List<Url> urls = UrlsRepository.getEntities();
+            List<UrlCheck> urlChecks = new ArrayList<>();
+            for (Url url : urls) {
+                List<UrlCheck> checksForUrl = UrlCheckRepository.findByUrlId(url.getId());
+                urlChecks.addAll(checksForUrl);
+            }
             ctx.attribute("urls", urls);
-            var page = new UrlsPage(urls);
+            var page = new UrlsPage(urls, urlChecks);
             ctx.render("urls/index.jte", Collections.singletonMap("page", page));
         } catch (SQLException e) {
             ctx.status(500);
@@ -45,7 +53,7 @@ public class UrlsController {
                 ctx.status(404);
                 ctx.sessionAttribute("flash", "URL с указанным ID не найден");
                 List<Url> urls = UrlsRepository.getEntities();
-                var page = new UrlsPage(urls);
+                var page = new UrlsPage(urls, urlChecks);
                 var flash = ctx.consumeSessionAttribute("flash");
                 page.setFlash((String) flash);
                 ctx.render("urls/index.jte", Collections.singletonMap("page", page));
@@ -69,21 +77,39 @@ public class UrlsController {
         try {
             Url url = UrlsRepository.find(id).orElse(null);
             if (url != null) {
-                HttpResponse<JsonNode> response;
+                HttpResponse<String> response;
                 try {
-                    response = Unirest.get(url.getName()).asJson();
+                    // Отправляем запрос и получаем тело ответа в виде строки
+                    response = Unirest.post(url.getName()).asString();
+
+                    // Получаем тело ответа в виде строки
+                    String responseBody = response.getBody();
+
+                    // Преобразуем строку в объект Document (например, если это HTML)
+                    Document document = Jsoup.parse(responseBody);
+
+                    // Получаем необходимые данные из документа
+
+                    String title = "title not found";
+                    String h1 = "h1 not found";
+                    String description = "description not found";
+
+                    if (response.getStatus() == 200) { // Проверяем успешность запроса
+                        title = document.title();
+                        h1 = Objects.requireNonNull(document.select("h1").first()).text();
+                        description = document.select("meta[name=description]").attr("content");
+                    }
 
                     long urlCheckId = UrlCheckRepository.getNextIdForUrl(url.getId());
-
-                    var urlCheck = new UrlCheck();
+                    UrlCheck urlCheck = new UrlCheck();
                     urlCheck.setUrl(url);
                     urlCheck.setId(urlCheckId);
                     urlCheck.setUrlId(url.getId());
                     urlCheck.setStatusCode(response.getStatus());
                     urlCheck.setCreatedAt(LocalDateTime.now());
-                    urlCheck.setTitle("Extracted title from response");
-                    urlCheck.setH1("Extracted H1 from response");
-                    urlCheck.setDescription("Extracted description from response");
+                    urlCheck.setTitle(title);
+                    urlCheck.setH1(h1);
+                    urlCheck.setDescription(description);
 
                     UrlCheckRepository.save(urlCheck);
 

@@ -1,5 +1,6 @@
 @import hexlet.code.dto.UrlPage
 @import hexlet.code.util.NamedRoutes
+@import java.time.LocalDateTime
 
 @param UrlPage page
 
@@ -18,19 +19,53 @@ content = @`
     <body>
     <h1>Просмотр URL</h1>
     @if (page != null && page.getUrl() != null)
-        <div>${page.getUrl().toString()}</div>
+        <div class="site-info">
+            <h2>Сайт: ${page.getUrl().getName()}</h2>
+            <table class="table">
+                <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td>${page.getUrl().getId()}</td>
+                </tr>
+                <tr>
+                    <td>Имя</td>
+                    <td>${page.getUrl().getName()}</td>
+                </tr>
+                <tr>
+                    <td>Дата создания</td>
+                    <td>${page.getUrl().getCreatedAt().toString()}</td> <!-- Assuming a method getCreatedAt() exists -->
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <h2>Проверки</h2>
         <p><a href="${NamedRoutes.checksUrlPath(page.getUrl().getId())}">Запустить проверку</a></p>
-    @endif
-    @if (page != null && page.getUrlChecks() != null)
-        @for(var index = 0; index < page.getUrlChecks().size(); index++)
-            <div>Проверка №${index + 1}</div>
-            <div>Id: ${page.getUrlChecks().get(index).getId()}</div>
-            <div>Title: ${page.getUrlChecks().get(index).getTitle()}</div>
-            <div>H1: ${page.getUrlChecks().get(index).getH1()}</div>
-            <div>Description: ${page.getUrlChecks().get(index).getDescription()}</div>
-            <div>Connection: ${page.getUrlChecks().get(index).toString()}</div>
-            <div>Status: ${page.getUrlChecks().get(index).getStatusCode()}</div>
-        @endfor
+        <table class="table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Код ответа</th>
+                <th>title</th>
+                <th>h1</th>
+                <th>description</th>
+                <th>Дата проверки</th>
+            </tr>
+            </thead>
+            <tbody>
+            @if (page.getUrlChecks() != null)
+                @for(var check : page.getUrlChecks())
+                    <tr>
+                        <td>${check.getId()}</td>
+                        <td>${check.getStatusCode()}</td>
+                        <td>${check.getTitle()}</td>
+                        <td>${check.getH1()}</td>
+                        <td>${check.getDescription()}</td>
+                        <td>${LocalDateTime.now().toString()}</td>
+                    </tr>
+                @endfor
+            @endif
+            </tbody>
+        </table>
     @endif
     </body>
 `,

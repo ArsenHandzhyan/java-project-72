@@ -7,8 +7,8 @@
 page = page,
 content = @`
     <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
               rel="stylesheet"
               integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We"
@@ -17,19 +17,36 @@ content = @`
     </head>
     <body>
     <h1>Список добавленных URL</h1>
-    <ul>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Имя</th>
+            <th>Последняя проверка</th>
+            <th>Код ответа</th>
+        </tr>
+        </thead>
+        <tbody>
         @if (page != null && !page.getUrls().isEmpty())
             @for(var url : page.getUrls())
-                <div>
-                    <p><a href="${NamedRoutes.urlsPath()}/${url.getId()}">
-                            <div>Name: ${url.getName()} CreatedAt: ${url.getCreatedAt().toString()}</div>
-                        </a></p>
-                </div>
+                <tr>
+                    <td>${url.getId()}</td>
+                    <td><a href="${NamedRoutes.urlsPath()}/${url.getId()}">${url.getName()}</a></td>
+                    @if (page.getUrlChecks() != null && page.getUrlChecks().size() > url.getId().intValue() - 1)
+                        <td>${page.getUrlChecks().get(url.getId().intValue() - 1).getCreatedAt().toString()}</td>
+                        <td>${page.getUrlChecks().get(url.getId().intValue() - 1).getStatusCode()}</td>
+                    @else
+                        <td colspan="2">No check available</td>
+                    @endif
+                </tr>
             @endfor
         @else
-            <p>Список пустой!</p>
+            <tr>
+                <td colspan="4">Список пустой!</td>
+            </tr>
         @endif
-    </ul>
+        </tbody>
+    </table>
     </body>
 `,
 footer = @`

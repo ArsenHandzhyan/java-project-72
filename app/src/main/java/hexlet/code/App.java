@@ -7,7 +7,9 @@ import gg.jte.TemplateEngine;
 import gg.jte.resolve.ResourceCodeResolver;
 import hexlet.code.controller.MainController;
 import hexlet.code.controller.UrlsController;
+import hexlet.code.model.Url;
 import hexlet.code.repository.BaseRepository;
+import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinJte;
@@ -18,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 public class App {
@@ -26,8 +29,8 @@ public class App {
     public static void main(String[] args) throws SQLException, IOException {
         BaseRepository.dataSource = initializeDataSource();
         var app = getApp();
-//        Url url = new Url("https://example.com", LocalDateTime.now());
-//        UrlsRepository.save(url);
+        Url url = new Url("https://google.com", LocalDateTime.now());
+        UrlsRepository.save(url);
         app.get(NamedRoutes.homePath(), MainController::index);
         app.post(NamedRoutes.homePath(), MainController::addUrl);
         app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);

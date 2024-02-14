@@ -13,7 +13,6 @@ public class UrlCheck {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Long urlId;
 
     @ManyToOne(fetch = FetchType.LAZY)
