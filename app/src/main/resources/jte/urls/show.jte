@@ -73,7 +73,7 @@ content = @`
 `,
 footer = @`
     <p><a href="${NamedRoutes.homePath()}">Главная</a></p>
-    <p><a href="${NamedRoutes.urlsPath()}">Назад</a></p>
+    <p><a href="${NamedRoutes.urlsPath()}">Сайты</a></p>
     <p><a href="https://github.com/ArsenHandzhyan">github аккаунт</a></p>
 `
 )

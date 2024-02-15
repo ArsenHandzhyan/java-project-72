@@ -23,11 +23,11 @@ content = @`
         <input type="text" id="url" name="url" placeholder="ссылка" required>
         <button type="submit">Проверить</button>
     </form>
-    <p><a href="${NamedRoutes.urlsPath()}">Список добавленных URL</a></p>
     </body>
 `,
 footer = @`
     <p><a href="${NamedRoutes.homePath()}">Главная</a></p>
+    <p><a href="${NamedRoutes.urlsPath()}">Сайты</a></p>
     <p><a href="https://github.com/ArsenHandzhyan">github аккаунт</a></p>
 `
 )

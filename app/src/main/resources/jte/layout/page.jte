@@ -21,13 +21,13 @@
         <p>${page.getFlash()}</p>
     </div>
 @endif
-<div class="content">
-    ${content}
-</div>
 @if (footer != null)
     <div class="footer">
         ${footer}
     </div>
 @endif
+<div class="content">
+    ${content}
+</div>
 </body>
 </html>
