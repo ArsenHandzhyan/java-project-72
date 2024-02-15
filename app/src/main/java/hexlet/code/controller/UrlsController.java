@@ -114,7 +114,8 @@ public class UrlsController {
         ctx.sessionAttribute("flash", "Failed to send HTTP request");
     }
 
-    private static void handleSuccessfulHttpRequest(Context ctx, Url url, HttpResponse<String> response) throws SQLException {
+    private static void handleSuccessfulHttpRequest(Context ctx, Url url, HttpResponse<String> response)
+            throws SQLException {
         Document document = Jsoup.parse(response.getBody());
         String title = "";
         String h1 = "";
@@ -133,7 +134,8 @@ public class UrlsController {
         return elements.first() != null ? Objects.requireNonNull(elements.first()).text() : "";
     }
 
-    private static void saveUrlCheck(Context ctx, Url url, int statusCode, String title, String h1, String description) throws SQLException {
+    private static void saveUrlCheck(Context ctx, Url url, int statusCode, String title, String h1, String description)
+            throws SQLException {
         long urlCheckId = UrlCheckRepository.getNextIdForUrl(url.getId());
         UrlCheck urlCheck = new UrlCheck();
         urlCheck.setUrl(url);
