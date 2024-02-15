@@ -47,6 +47,7 @@ public class UrlsController {
             Url url = UrlsRepository.find(id).orElse(null);
             List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(id);
             if (url != null) {
+                ctx.sessionAttribute("flash", "URL добавлен");
                 ctx.attribute("url", url);
                 var page = new UrlPage(url, urlChecks);
                 var flash = ctx.consumeSessionAttribute("flash");
