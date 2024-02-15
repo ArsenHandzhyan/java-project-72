@@ -47,7 +47,6 @@ public class UrlsController {
             Url url = UrlsRepository.find(id).orElse(null);
             List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(id);
             if (url != null) {
-                ctx.sessionAttribute("flash", "URL добавлен");
                 ctx.attribute("url", url);
                 var page = new UrlPage(url, urlChecks);
                 var flash = ctx.consumeSessionAttribute("flash");
@@ -98,7 +97,7 @@ public class UrlsController {
 
     private static void handleUrlNotFound(Context ctx) {
         ctx.status(404);
-        ctx.sessionAttribute("flash", "URL with the specified ID not found");
+        ctx.sessionAttribute("flash", "URL-адрес с указанным идентификатором не найден");
         ctx.redirect(NamedRoutes.urlsPath());
     }
 
@@ -112,7 +111,7 @@ public class UrlsController {
 
     private static void handleFailedHttpRequest(Context ctx) {
         ctx.status(500);
-        ctx.sessionAttribute("flash", "Failed to send HTTP request");
+        ctx.sessionAttribute("flash", "Не удалось отправить HTTP-запрос");
     }
 
     private static void handleSuccessfulHttpRequest(Context ctx, Url url, HttpResponse<String> response)
@@ -150,12 +149,12 @@ public class UrlsController {
         UrlCheckRepository.save(urlCheck);
 
         ctx.status(201);
-        ctx.sessionAttribute("flash", "URL successfully checked");
+        ctx.sessionAttribute("flash", "URL успешно проверен");
         ctx.redirect(NamedRoutes.urlPath(url.getId()));
     }
 
     private static void handleSQLException(Context ctx) {
         ctx.status(500);
-        ctx.sessionAttribute("flash", "An error occurred while checking the URL");
+        ctx.sessionAttribute("flash", "Произошла ошибка при проверке URL-адреса.");
     }
 }
