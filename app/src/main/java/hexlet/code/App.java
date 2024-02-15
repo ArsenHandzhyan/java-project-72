@@ -24,7 +24,6 @@ public class App {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) throws SQLException, IOException {
-        BaseRepository.dataSource = initializeDataSource();
         var app = getApp();
         app.get(NamedRoutes.homePath(), MainController::index);
         app.post(NamedRoutes.homePath(), MainController::addUrl);
@@ -35,7 +34,8 @@ public class App {
         app.start(app.port());
     }
 
-    public static Javalin getApp() {
+    public static Javalin getApp() throws SQLException, IOException {
+        BaseRepository.dataSource = initializeDataSource();
         JavalinJte.init(createTemplateEngine());
         return Javalin.create();
     }
@@ -44,15 +44,14 @@ public class App {
         String jdbcUrl = System.getenv("jdbc:postgresql://"
                 + "dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres.render.com"
                 + "/new_postgresql_for_javalin");
-        HikariConfig hikariConfig = new HikariConfig();
-
-        if (jdbcUrl != null && !jdbcUrl.isEmpty()) {
-            hikariConfig.setJdbcUrl(jdbcUrl);
-        } else {
-            hikariConfig.setJdbcUrl("jdbc:h2:mem:project");
+        if (jdbcUrl == null || jdbcUrl.isEmpty()) {
+            jdbcUrl = "jdbc:h2:mem:project";
         }
 
-        if (jdbcUrl == null || jdbcUrl.isEmpty()) {
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(jdbcUrl);
+
+        if (jdbcUrl.equals("jdbc:h2:mem:project")) {
             hikariConfig.setUsername("new_postgresql_for_javalin_user");
             hikariConfig.setPassword("GvGwspqIZhAYD3HDJjbP9QP51RSh5yf9");
         }

@@ -1,5 +1,6 @@
 @import hexlet.code.dto.UrlsPage
 @import hexlet.code.util.NamedRoutes
+@import java.time.format.DateTimeFormatter
 
 @param UrlsPage page
 
@@ -33,8 +34,10 @@ content = @`
                     <td>${url.getId()}</td>
                     <td><a href="${NamedRoutes.urlsPath()}/${url.getId()}">${url.getName()}</a></td>
                     @if (page.getUrlChecks() != null && page.getUrlChecks().size() > url.getId().intValue() - 1)
-                        <td>${page.getUrlChecks().get(url.getId().intValue() - 1).getCreatedAt().toString()}</td>
-                        <td>${page.getUrlChecks().get(url.getId().intValue() - 1).getStatusCode()}</td>
+                        <td>${page.getUrlChecks().get(url.getId().intValue() - 1)
+                        .getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))}</td>
+                        <td>${page.getUrlChecks().get(url.getId().intValue() - 1)
+                        .getStatusCode()}</td>
                     @else
                         <td colspan="2">No check available</td>
                     @endif

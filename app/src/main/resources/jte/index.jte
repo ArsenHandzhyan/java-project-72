@@ -16,11 +16,12 @@ content = @`
         <title>Hello Hexlet!</title>
     </head>
     <body>
-    <h1>Добавить адрес</h1>
+    <h1>Анализатор страниц</h1>
+    <h3>Бесплатно проверяйте сайты на SEO пригодность</h3>
     <form action="${NamedRoutes.homePath()}" method="POST">
         <label for="url">Введите адрес:</label>
-        <input type="text" id="url" name="url" required>
-        <button type="submit">Добавить</button>
+        <input type="text" id="url" name="url" placeholder="ссылка" required>
+        <button type="submit">Проверить</button>
     </form>
     <p><a href="${NamedRoutes.urlsPath()}">Список добавленных URL</a></p>
     </body>

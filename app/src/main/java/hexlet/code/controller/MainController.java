@@ -29,6 +29,13 @@ public class MainController {
         try {
             assert inputUrl != null;
             URI uri = new URI(inputUrl);
+
+            if (uri.getScheme() == null || uri.getHost() == null) {
+                ctx.sessionAttribute("flash", "Некорректный URL: схема или хост отсутствуют");
+                ctx.redirect(NamedRoutes.homePath());
+                return;
+            }
+
             String domainWithProtocolAndPort = uri.getScheme() + "://" + uri.getHost();
             if (uri.getPort() != -1) {
                 domainWithProtocolAndPort += ":" + uri.getPort();
@@ -47,7 +54,6 @@ public class MainController {
             var flash = ctx.consumeSessionAttribute("flash");
             List<Url> urls = UrlsRepository.getEntities();
             List<UrlCheck> urlChecks = new ArrayList<>();
-            // Populate urlChecks for each Url
             for (Url url1 : urls) {
                 List<UrlCheck> checksForUrl = UrlCheckRepository.findByUrlId(url1.getId());
                 urlChecks.addAll(checksForUrl);
@@ -57,7 +63,7 @@ public class MainController {
             page.setFlash((String) flash);
             ctx.render("urls/index.jte", Collections.singletonMap("page", page));
         } catch (Exception e) {
-            ctx.sessionAttribute("flash", "Некорректный URL");
+            ctx.sessionAttribute("flash", "Некорректный URL: " + e.getMessage());
             ctx.redirect(NamedRoutes.homePath());
         }
     }
