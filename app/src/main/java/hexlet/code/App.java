@@ -22,22 +22,36 @@ import java.util.stream.Collectors;
 
 public class App {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+    private static Javalin app;
 
     public static void main(String[] args) throws SQLException, IOException {
-        var app = getApp();
-        app.get(NamedRoutes.homePath(), MainController::index);
-        app.post(NamedRoutes.homePath(), MainController::addUrl);
-        app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
-        app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
-        app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
+        startApp();
+    }
 
+    public static void startApp() throws SQLException, IOException {
+        app = getApp();
+        configureRoutes();
         app.start(app.port());
+    }
+
+    public static void stopApp() {
+        if (app != null) {
+            app.stop();
+        }
     }
 
     public static Javalin getApp() throws SQLException, IOException {
         BaseRepository.dataSource = initializeDataSource();
         JavalinJte.init(createTemplateEngine());
         return Javalin.create();
+    }
+
+    private static void configureRoutes() {
+        app.get(NamedRoutes.homePath(), MainController::index);
+        app.post(NamedRoutes.homePath(), MainController::addUrl);
+        app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
+        app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
+        app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
     }
 
     private static HikariDataSource initializeDataSource() throws SQLException, IOException {
@@ -51,7 +65,7 @@ public class App {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(jdbcUrl);
 
-        if (jdbcUrl.equals("jdbc:h2:mem:project")) {
+        if (jdbcUrl.startsWith("jdbc:postgresql://")) {
             hikariConfig.setUsername("new_postgresql_for_javalin_user");
             hikariConfig.setPassword("GvGwspqIZhAYD3HDJjbP9QP51RSh5yf9");
         }
@@ -67,7 +81,10 @@ public class App {
 
                 try (var connection = dataSource.getConnection();
                      var statement = connection.createStatement()) {
+                    connection.setAutoCommit(false); // Установка автокоммита вручную
                     statement.execute(sql);
+                    connection.commit(); // Фиксация изменений
+                    connection.setAutoCommit(true); // Восстановление автокоммита
                 }
             }
             return dataSource;
