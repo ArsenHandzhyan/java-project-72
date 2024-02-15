@@ -16,7 +16,7 @@ public class UrlsRepository extends UrlHelper {
         String sql = "INSERT INTO urls (name) VALUES (?)";
         try (var conn = dataSource.getConnection();
              var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, url.getName());
+            preparedStatement.setString(1, UrlHelper.normalizeUrl(url.getName()));
             preparedStatement.executeUpdate();
             var generatedKeys = preparedStatement.getGeneratedKeys();
             if (generatedKeys.next()) {

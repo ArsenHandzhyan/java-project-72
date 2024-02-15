@@ -10,10 +10,13 @@ import io.javalin.testtools.JavalinTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
@@ -37,6 +40,13 @@ public class AppTest {
         configureRoutes();
         mockWebServer = new MockWebServer();
         mockWebServer.start();
+    }
+
+    @Test
+    void testH2Connection() throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:h2:mem:project");
+        Assertions.assertNotNull(connection);
+        connection.close();
     }
 
     @Test

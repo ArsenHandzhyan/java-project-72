@@ -13,6 +13,7 @@ import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -77,52 +78,81 @@ public class UrlsController {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         try {
             Url url = UrlsRepository.find(id).orElse(null);
-            if (url != null) {
-                HttpResponse<String> response;
-                try {
-                    response = Unirest.post(url.getName()).asString();
-                    String responseBody = response.getBody();
-                    Document document = Jsoup.parse(responseBody);
-
-                    String title = "title not found";
-                    String h1 = "h1 not found";
-                    String description = "description not found";
-
-                    if (response.getStatus() == 200) {
-                        title = document.title();
-                        h1 = Objects.requireNonNull(document.select("h1").first()).text();
-                        description = document.select("meta[name=description]").attr("content");
-                    }
-
-                    long urlCheckId = UrlCheckRepository.getNextIdForUrl(url.getId());
-                    UrlCheck urlCheck = new UrlCheck();
-                    urlCheck.setUrl(url);
-                    urlCheck.setId(urlCheckId);
-                    urlCheck.setUrlId(url.getId());
-                    urlCheck.setStatusCode(response.getStatus());
-                    urlCheck.setCreatedAt(LocalDateTime.now());
-                    urlCheck.setTitle(title);
-                    urlCheck.setH1(h1);
-                    urlCheck.setDescription(description);
-
-                    UrlCheckRepository.save(urlCheck);
-
-                    ctx.status(201);
-                    ctx.sessionAttribute("flash", "URL successfully checked");
-                } catch (UnirestException e) {
-                    ctx.status(500);
-                    ctx.sessionAttribute("flash", "Failed to send HTTP request");
-                }
-            } else {
-                ctx.status(404);
-                ctx.sessionAttribute("flash", "URL with the specified ID not found");
-                ctx.redirect(NamedRoutes.urlsPath());
+            if (url == null) {
+                handleUrlNotFound(ctx);
+                return;
             }
+
+            HttpResponse<String> response = sendHttpRequest(url);
+            if (response == null) {
+                handleFailedHttpRequest(ctx);
+                return;
+            }
+
+            handleSuccessfulHttpRequest(ctx, url, response);
         } catch (SQLException e) {
-            ctx.status(500);
-            ctx.sessionAttribute("flash", "An error occurred while checking the URL");
+            handleSQLException(ctx);
+        }
+    }
+
+    private static void handleUrlNotFound(Context ctx) {
+        ctx.status(404);
+        ctx.sessionAttribute("flash", "URL with the specified ID not found");
+        ctx.redirect(NamedRoutes.urlsPath());
+    }
+
+    private static HttpResponse<String> sendHttpRequest(Url url) {
+        try {
+            return Unirest.post(url.getName()).asString();
+        } catch (UnirestException e) {
+            return null;
+        }
+    }
+
+    private static void handleFailedHttpRequest(Context ctx) {
+        ctx.status(500);
+        ctx.sessionAttribute("flash", "Failed to send HTTP request");
+    }
+
+    private static void handleSuccessfulHttpRequest(Context ctx, Url url, HttpResponse<String> response) throws SQLException {
+        Document document = Jsoup.parse(response.getBody());
+        String title = "";
+        String h1 = "";
+        String description = "";
+
+        if (response.getStatus() == 200) {
+            title = document.title();
+            h1 = getFirstElementText(document.select("h1"));
+            description = document.select("meta[name=description]").attr("content");
         }
 
-        ctx.redirect(NamedRoutes.urlPath(id));
+        saveUrlCheck(ctx, url, response.getStatus(), title, h1, description);
+    }
+
+    private static String getFirstElementText(Elements elements) {
+        return elements.first() != null ? Objects.requireNonNull(elements.first()).text() : "";
+    }
+
+    private static void saveUrlCheck(Context ctx, Url url, int statusCode, String title, String h1, String description) throws SQLException {
+        long urlCheckId = UrlCheckRepository.getNextIdForUrl(url.getId());
+        UrlCheck urlCheck = new UrlCheck();
+        urlCheck.setUrl(url);
+        urlCheck.setId(urlCheckId);
+        urlCheck.setUrlId(url.getId());
+        urlCheck.setStatusCode(statusCode);
+        urlCheck.setCreatedAt(LocalDateTime.now());
+        urlCheck.setTitle(title);
+        urlCheck.setH1(h1);
+        urlCheck.setDescription(description);
+        UrlCheckRepository.save(urlCheck);
+
+        ctx.status(201);
+        ctx.sessionAttribute("flash", "URL successfully checked");
+        ctx.redirect(NamedRoutes.urlPath(url.getId()));
+    }
+
+    private static void handleSQLException(Context ctx) {
+        ctx.status(500);
+        ctx.sessionAttribute("flash", "An error occurred while checking the URL");
     }
 }
