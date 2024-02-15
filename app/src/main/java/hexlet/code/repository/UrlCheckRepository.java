@@ -2,18 +2,22 @@ package hexlet.code.repository;
 
 import hexlet.code.model.UrlCheck;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static hexlet.code.repository.BaseRepository.dataSource;
 
 public class UrlCheckRepository {
 
     public static void save(UrlCheck urlCheck) throws SQLException {
-        String sql = "INSERT INTO url_checks (url_id, status_code, title, h1, description, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO url_checks (url_id, status_code, title, h1, description, created_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setLong(1, urlCheck.getUrl().getId());
@@ -45,27 +49,6 @@ public class UrlCheckRepository {
                 urlChecks.add(urlCheck);
             }
             return urlChecks;
-        }
-    }
-
-    public static Optional<UrlCheck> findById(Long id) throws SQLException {
-        String sql = "SELECT * FROM url_checks WHERE id = ?";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-            preparedStatement.setLong(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                UrlCheck urlCheck = new UrlCheck();
-                urlCheck.setId(resultSet.getLong("id"));
-                urlCheck.setUrlId(resultSet.getLong("url_id"));
-                urlCheck.setStatusCode(resultSet.getInt("status_code"));
-                urlCheck.setTitle(resultSet.getString("title"));
-                urlCheck.setH1(resultSet.getString("h1"));
-                urlCheck.setDescription(resultSet.getString("description"));
-                urlCheck.setCreatedAt(resultSet.getObject("created_at", LocalDateTime.class));
-                return Optional.of(urlCheck);
-            }
-            return Optional.empty();
         }
     }
 

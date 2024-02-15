@@ -1,58 +1,56 @@
 package hexlet.code;
 
+import hexlet.code.controller.MainController;
+import hexlet.code.controller.UrlsController;
 import hexlet.code.model.Url;
 import hexlet.code.repository.UrlsRepository;
+import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
 import io.javalin.testtools.JavalinTest;
-import org.junit.jupiter.api.Assertions;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AppTest {
-    Javalin app;
+    private Javalin app;
+    private MockWebServer mockWebServer;
+
+    private void configureRoutes() {
+        app.get(NamedRoutes.homePath(), MainController::index);
+        app.post(NamedRoutes.homePath(), MainController::addUrl);
+        app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
+        app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
+        app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
+    }
 
     @BeforeEach
-    public final void setUp() {
+    public void setUp() throws SQLException, IOException {
         app = App.getApp();
+        configureRoutes();
+        mockWebServer = new MockWebServer();
+        mockWebServer.start();
     }
 
     @Test
-    void testH2Connection() throws SQLException {
-        Connection connection = DriverManager.getConnection("jdbc:h2:mem:project");
-        Assertions.assertNotNull(connection);
-        connection.close();
-    }
-
-    @Test
-    void testPostgresConnection() throws SQLException {
-        String jdbcUrl = "jdbc:postgresql://dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres"
-                + ".render.com/new_postgresql_for_javalin?"
-                + "user=new_postgresql_for_javalin_user&"
-                + "password=GvGwspqIZhAYD3HDJjbP9QP51RSh5yf9";
-        Connection connection = DriverManager.getConnection(jdbcUrl);
-        Assertions.assertNotNull(connection);
-        connection.close();
-    }
-
-
-    @Test
-    public void testMainPage() {
+    void testMainPage() {
         JavalinTest.test(app, (server, client) -> {
             var response = client.get("/");
             assertThat(response.code()).isEqualTo(200);
-            assertThat(response.body().string()).contains("Hexlet Javalin Example");
+            assert response.body() != null;
+            assertThat(response.body().string()).contains("Hello Hexlet!");
         });
     }
 
     @Test
-    public void testUrlsPage() {
+    void testUrlsPage() {
         JavalinTest.test(app, (server, client) -> {
             var response = client.get("/urls");
             assertThat(response.code()).isEqualTo(200);
@@ -60,7 +58,27 @@ public class AppTest {
     }
 
     @Test
-    public void testUrlPage() throws SQLException {
+    void testUrlPage() throws SQLException {
+        var url = new Url("https://example.com", LocalDateTime.now());
+        UrlsRepository.save(url);
+        mockWebServer.enqueue(new MockResponse().setBody("hello, world!"));
+
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.get("/urls/" + url.getId());
+            assertThat(response.code()).isEqualTo(200);
+        });
+    }
+
+    @Test
+    void testUrlNotFound() {
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.get("/urls/999999");
+            assertThat(response.code()).isEqualTo(404);
+        });
+    }
+
+    @Test
+    void testAddUrl() throws SQLException {
         var url = new Url("https://example.com", LocalDateTime.now());
         UrlsRepository.save(url);
         JavalinTest.test(app, (server, client) -> {
@@ -69,11 +87,9 @@ public class AppTest {
         });
     }
 
-    @Test
-    void testUrlNotFound() throws Exception {
-        JavalinTest.test(app, (server, client) -> {
-            var response = client.get("/urls/999999");
-            assertThat(response.code()).isEqualTo(404);
-        });
+    @AfterEach
+    public void tearDown() throws IOException {
+        mockWebServer.shutdown();
+        App.stopApp();
     }
 }
