@@ -84,7 +84,7 @@ public class AppTest {
     void testUrlNotFound() {
         JavalinTest.test(app, (server, client) -> {
             var response = client.get("/urls/999999");
-            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.code()).isEqualTo(404);
         });
     }
 
