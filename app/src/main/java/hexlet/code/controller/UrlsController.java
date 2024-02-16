@@ -89,6 +89,7 @@ public class UrlsController {
     }
 
     private static void handleUrlNotFound(Context ctx) {
+        ctx.status(200);
         ctx.sessionAttribute("flash", "URL-адрес с указанным идентификатором не найден");
         ctx.redirect(NamedRoutes.urlsPath());
     }
