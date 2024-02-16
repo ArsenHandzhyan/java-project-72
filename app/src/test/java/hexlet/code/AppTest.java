@@ -3,6 +3,7 @@ package hexlet.code;
 import hexlet.code.controller.MainController;
 import hexlet.code.controller.UrlsController;
 import hexlet.code.model.Url;
+import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
@@ -101,5 +102,15 @@ public class AppTest {
     public void tearDown() throws IOException {
         mockWebServer.shutdown();
         App.stopApp();
+    }
+
+    @Test
+    void testFailedHttpRequest() throws SQLException {
+        // Тест обработки ситуации, когда HTTP-запрос завершается неудачей
+        var url = new Url("https://example.com", LocalDateTime.now());
+        UrlsRepository.save(url);
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+        AppTestUtils.waitForApp();
+        assertThat(UrlCheckRepository.findLastByUrlId(url.getId())).isNull();
     }
 }

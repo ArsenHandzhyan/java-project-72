@@ -64,7 +64,6 @@ public class UrlCheckRepository {
             if (resultSet.next()) {
                 return resultSet.getLong("next_id");
             }
-            // Если не удалось получить следующий id, возвращаем значение по умолчанию
             return 1;
         }
     }
@@ -86,10 +85,8 @@ public class UrlCheckRepository {
                 urlCheck.setCreatedAt(resultSet.getObject("created_at", LocalDateTime.class));
                 return urlCheck;
             }
-            // Возвращаем null, если не найдено ни одной проверки URL
             return null;
         } catch (SQLException e) {
-            // В случае исключения возвращаем null или выполняем другую обработку, в зависимости от требований приложения
             return null;
         }
     }

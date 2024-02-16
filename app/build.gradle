@@ -22,9 +22,9 @@ dependencies {
     testImplementation("io.javalin:javalin:3.+")
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'io.javalin:javalin-testtools:5.6.3'
 
     implementation("io.javalin:javalin:5.6.3")
-    implementation("io.javalin:javalin-bundle:5.6.3")
     implementation("io.javalin:javalin-rendering:5.6.3")
 
     implementation 'org.postgresql:postgresql:42.5.1'
@@ -32,8 +32,9 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
     implementation 'org.apache.commons:commons-text:1.11.0'
-    implementation("org.slf4j:slf4j-simple:2.0.7")
     implementation 'org.jsoup:jsoup:1.17.2'
+    implementation 'org.slf4j:slf4j-simple:2.0.7'
+    implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.1'
     implementation("com.h2database:h2:2.2.220")
@@ -50,6 +51,14 @@ dependencies {
     implementation 'javax.persistence:javax.persistence-api:2.2'
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Test).configureEach {
+    systemProperty 'file.encoding', 'UTF-8'
+    systemProperty 'console.encoding', 'UTF-8'
+}
 
 compileJava {
     options.release.set(20)
