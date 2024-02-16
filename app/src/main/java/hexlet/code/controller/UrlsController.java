@@ -121,30 +121,23 @@ public class UrlsController {
             h1 = getFirstElementText(document.select("h1"));
             description = document.select("meta[name=description]").attr("content");
         }
-
-        saveUrlCheck(ctx, url, response.getStatus(), title, h1, description);
-    }
-
-    private static String getFirstElementText(Elements elements) {
-        return elements.first() != null ? Objects.requireNonNull(elements.first()).text() : "";
-    }
-
-    private static void saveUrlCheck(Context ctx, Url url, int statusCode, String title, String h1, String description)
-            throws SQLException {
         long urlCheckId = UrlCheckRepository.getNextIdForUrl(url.getId());
         UrlCheck urlCheck = new UrlCheck();
         urlCheck.setUrl(url);
         urlCheck.setId(urlCheckId);
         urlCheck.setUrlId(url.getId());
-        urlCheck.setStatusCode(statusCode);
+        urlCheck.setStatusCode(response.getStatus());
         urlCheck.setCreatedAt(LocalDateTime.now());
         urlCheck.setTitle(title);
         urlCheck.setH1(h1);
         urlCheck.setDescription(description);
         UrlCheckRepository.save(urlCheck);
-
         ctx.status(201);
         ctx.sessionAttribute("flash", "URL успешно проверен");
         ctx.redirect(NamedRoutes.urlPath(url.getId()));
+    }
+
+    private static String getFirstElementText(Elements elements) {
+        return elements.first() != null ? Objects.requireNonNull(elements.first()).text() : "";
     }
 }
