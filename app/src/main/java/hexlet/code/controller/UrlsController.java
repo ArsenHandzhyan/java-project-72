@@ -35,18 +35,36 @@ public class UrlsController {
         }
     }
 
-    public static void showUrlById(Context ctx) {
+    public static void showUrlById(Context ctx) throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         try {
-            Url url = getUrlById(ctx, id);
+            Url url = UrlsRepository.find(id).orElse(null);
+            List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(id);
             if (url != null) {
-                renderUrlPage(ctx, url);
+                ctx.attribute("url", url);
+                var page = new UrlPage(url, urlChecks);
+                var flash = ctx.consumeSessionAttribute("flash");
+                page.setFlash((String) flash);
+                ctx.render("urls/show.jte", Collections.singletonMap("page", page));
             } else {
-                handleUrlNotFound(ctx);
+                ctx.status(404);
+                ctx.sessionAttribute("flash", "URL с указанным ID не найден");
+                List<Url> urls = UrlsRepository.getEntities();
+                var page = new UrlsPage(urls);
+                var flash = ctx.consumeSessionAttribute("flash");
+                page.setFlash((String) flash);
+                ctx.render("urls/index.jte", Collections.singletonMap("page", page));
             }
         } catch (SQLException e) {
+            id = ctx.pathParamAsClass("id", Long.class).get();
+            Url url = UrlsRepository.find(id).orElse(null);
+            List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(id);
             ctx.status(500);
             ctx.sessionAttribute("flash", "Произошла ошибка при получении URL по ID");
+            var page = new UrlPage(url, urlChecks);
+            var flash = ctx.consumeSessionAttribute("flash");
+            page.setFlash((String) flash);
+            ctx.render("urls/show.jte", Collections.singletonMap("page", page));
         }
     }
 
@@ -67,27 +85,8 @@ public class UrlsController {
 
             handleSuccessfulHttpRequest(ctx, url, response);
         } catch (SQLException e) {
-            ctx.status(500);
-            ctx.sessionAttribute("flash", "Произошла ошибка при проверке URL-адреса.");
+            handleSQLException(ctx);
         }
-    }
-
-    private static Url getUrlById(Context ctx, long id) throws SQLException {
-        Url url = UrlsRepository.find(id).orElse(null);
-        if (url == null) {
-            ctx.status(404);
-            ctx.sessionAttribute("flash", "URL с указанным ID не найден");
-        }
-        return url;
-    }
-
-    private static void renderUrlPage(Context ctx, Url url) throws SQLException {
-        List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(url.getId());
-        ctx.attribute("url", url);
-        var page = new UrlPage(url, urlChecks);
-        var flash = ctx.consumeSessionAttribute("flash");
-        page.setFlash((String) flash);
-        ctx.render("urls/show.jte", Collections.singletonMap("page", page));
     }
 
     private static void handleUrlNotFound(Context ctx) {
@@ -121,23 +120,35 @@ public class UrlsController {
             h1 = getFirstElementText(document.select("h1"));
             description = document.select("meta[name=description]").attr("content");
         }
+
+        saveUrlCheck(ctx, url, response.getStatus(), title, h1, description);
+    }
+
+    private static String getFirstElementText(Elements elements) {
+        return elements.first() != null ? Objects.requireNonNull(elements.first()).text() : "";
+    }
+
+    private static void saveUrlCheck(Context ctx, Url url, int statusCode, String title, String h1, String description)
+            throws SQLException {
         long urlCheckId = UrlCheckRepository.getNextIdForUrl(url.getId());
         UrlCheck urlCheck = new UrlCheck();
         urlCheck.setUrl(url);
         urlCheck.setId(urlCheckId);
         urlCheck.setUrlId(url.getId());
-        urlCheck.setStatusCode(response.getStatus());
+        urlCheck.setStatusCode(statusCode);
         urlCheck.setCreatedAt(LocalDateTime.now());
         urlCheck.setTitle(title);
         urlCheck.setH1(h1);
         urlCheck.setDescription(description);
         UrlCheckRepository.save(urlCheck);
+
         ctx.status(201);
         ctx.sessionAttribute("flash", "URL успешно проверен");
         ctx.redirect(NamedRoutes.urlPath(url.getId()));
     }
 
-    private static String getFirstElementText(Elements elements) {
-        return elements.first() != null ? Objects.requireNonNull(elements.first()).text() : "";
+    private static void handleSQLException(Context ctx) {
+        ctx.status(500);
+        ctx.sessionAttribute("flash", "Произошла ошибка при проверке URL-адреса.");
     }
 }
