@@ -24,7 +24,6 @@ import java.util.Objects;
 public class UrlsController {
     public static void showAllUrls(Context ctx) {
         try {
-            ctx.status(200);
             List<Url> urls = UrlsRepository.getEntities();
             ctx.attribute("urls", urls);
             var page = new UrlsPage(urls);
@@ -97,7 +96,7 @@ public class UrlsController {
 
     private static HttpResponse<String> sendHttpRequest(Url url) {
         try {
-            return Unirest.post(url.getName()).asString();
+            return Unirest.get(url.getName()).asString();
         } catch (UnirestException e) {
             return null;
         }
