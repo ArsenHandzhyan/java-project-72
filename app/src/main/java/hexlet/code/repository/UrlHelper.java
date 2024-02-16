@@ -21,7 +21,9 @@ public class UrlHelper {
 
     private static String getScheme(URI uri) {
         String scheme = uri.getScheme();
-        return (scheme != null && (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"))) ? scheme : null;
+        return (scheme != null
+                && (scheme.equalsIgnoreCase("http")
+                || scheme.equalsIgnoreCase("https"))) ? scheme : null;
     }
 
     private static String getHost(URI uri) {

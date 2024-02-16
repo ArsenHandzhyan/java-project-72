@@ -55,7 +55,9 @@ public class App {
     }
 
     private static HikariDataSource initializeDataSource() throws SQLException, IOException {
-        String jdbcUrl = System.getenv("jdbc:postgresql://dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres.render.com/new_postgresql_for_javalin");
+        String jdbcUrl = System.getenv("jdbc:postgresql://"
+                + "dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres"
+                + ".render.com/new_postgresql_for_javalin");
         if (jdbcUrl == null || jdbcUrl.isEmpty()) {
             jdbcUrl = "jdbc:h2:mem:project";
         }
