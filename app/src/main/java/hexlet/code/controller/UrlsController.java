@@ -35,36 +35,18 @@ public class UrlsController {
         }
     }
 
-    public static void showUrlById(Context ctx) throws SQLException {
+    public static void showUrlById(Context ctx) {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         try {
-            Url url = UrlsRepository.find(id).orElse(null);
-            List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(id);
+            Url url = getUrlById(ctx, id);
             if (url != null) {
-                ctx.attribute("url", url);
-                var page = new UrlPage(url, urlChecks);
-                var flash = ctx.consumeSessionAttribute("flash");
-                page.setFlash((String) flash);
-                ctx.render("urls/show.jte", Collections.singletonMap("page", page));
+                renderUrlPage(ctx, url);
             } else {
-                ctx.status(404);
-                ctx.sessionAttribute("flash", "URL с указанным ID не найден");
-                List<Url> urls = UrlsRepository.getEntities();
-                var page = new UrlsPage(urls);
-                var flash = ctx.consumeSessionAttribute("flash");
-                page.setFlash((String) flash);
-                ctx.render("urls/index.jte", Collections.singletonMap("page", page));
+                handleUrlNotFound(ctx);
             }
         } catch (SQLException e) {
-            id = ctx.pathParamAsClass("id", Long.class).get();
-            Url url = UrlsRepository.find(id).orElse(null);
-            List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(id);
             ctx.status(500);
             ctx.sessionAttribute("flash", "Произошла ошибка при получении URL по ID");
-            var page = new UrlPage(url, urlChecks);
-            var flash = ctx.consumeSessionAttribute("flash");
-            page.setFlash((String) flash);
-            ctx.render("urls/show.jte", Collections.singletonMap("page", page));
         }
     }
 
@@ -85,8 +67,27 @@ public class UrlsController {
 
             handleSuccessfulHttpRequest(ctx, url, response);
         } catch (SQLException e) {
-            handleSQLException(ctx);
+            ctx.status(500);
+            ctx.sessionAttribute("flash", "Произошла ошибка при проверке URL-адреса.");
         }
+    }
+
+    private static Url getUrlById(Context ctx, long id) throws SQLException {
+        Url url = UrlsRepository.find(id).orElse(null);
+        if (url == null) {
+            ctx.status(404);
+            ctx.sessionAttribute("flash", "URL с указанным ID не найден");
+        }
+        return url;
+    }
+
+    private static void renderUrlPage(Context ctx, Url url) throws SQLException {
+        List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(url.getId());
+        ctx.attribute("url", url);
+        var page = new UrlPage(url, urlChecks);
+        var flash = ctx.consumeSessionAttribute("flash");
+        page.setFlash((String) flash);
+        ctx.render("urls/show.jte", Collections.singletonMap("page", page));
     }
 
     private static void handleUrlNotFound(Context ctx) {
@@ -145,10 +146,5 @@ public class UrlsController {
         ctx.status(201);
         ctx.sessionAttribute("flash", "URL успешно проверен");
         ctx.redirect(NamedRoutes.urlPath(url.getId()));
-    }
-
-    private static void handleSQLException(Context ctx) {
-        ctx.status(500);
-        ctx.sessionAttribute("flash", "Произошла ошибка при проверке URL-адреса.");
     }
 }
