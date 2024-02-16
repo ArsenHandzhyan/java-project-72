@@ -55,9 +55,7 @@ public class App {
     }
 
     private static HikariDataSource initializeDataSource() throws SQLException, IOException {
-        String jdbcUrl = System.getenv("jdbc:postgresql://"
-                + "dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres.render.com"
-                + "/new_postgresql_for_javalin");
+        String jdbcUrl = System.getenv("jdbc:postgresql://dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres.render.com/new_postgresql_for_javalin");
         if (jdbcUrl == null || jdbcUrl.isEmpty()) {
             jdbcUrl = "jdbc:h2:mem:project";
         }
@@ -71,26 +69,33 @@ public class App {
         }
 
         try {
-            var dataSource = new HikariDataSource(hikariConfig);
-            var url = App.class.getClassLoader().getResource("schema.sql");
-            assert url != null;
-
-            try (var inputStream = url.openStream();
-                 var reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                var sql = reader.lines().collect(Collectors.joining("\n"));
-
-                try (var connection = dataSource.getConnection();
-                     var statement = connection.createStatement()) {
-                    connection.setAutoCommit(false); // Установка автокоммита вручную
-                    statement.execute(sql);
-                    connection.commit(); // Фиксация изменений
-                    connection.setAutoCommit(true); // Восстановление автокоммита
-                }
-            }
+            var dataSource = createDataSource(hikariConfig);
+            executeSqlScript(dataSource);
             return dataSource;
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             LOGGER.error("An error occurred while initializing data source", e);
             throw e;
+        }
+    }
+
+    private static HikariDataSource createDataSource(HikariConfig hikariConfig) {
+        return new HikariDataSource(hikariConfig);
+    }
+
+    private static void executeSqlScript(HikariDataSource dataSource) throws SQLException, IOException {
+        try (var connection = dataSource.getConnection();
+             var inputStream = App.class.getClassLoader().getResourceAsStream("schema.sql")) {
+            assert inputStream != null;
+            try (var reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                var sql = reader.lines().collect(Collectors.joining("\n"));
+
+                try (var statement = connection.createStatement()) {
+                    connection.setAutoCommit(false);
+                    statement.execute(sql);
+                    connection.commit();
+                    connection.setAutoCommit(true);
+                }
+            }
         }
     }
 
