@@ -40,15 +40,14 @@ public class UrlsController {
         try {
             Url url = UrlsRepository.find(id).orElse(null);
             List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(id);
+            ctx.status(200);
             if (url != null) {
-                ctx.status(200);
                 ctx.attribute("url", url);
                 var page = new UrlPage(url, urlChecks);
                 var flash = ctx.consumeSessionAttribute("flash");
                 page.setFlash((String) flash);
                 ctx.render("urls/show.jte", Collections.singletonMap("page", page));
             } else {
-                ctx.status(200);
                 ctx.sessionAttribute("flash", "URL с указанным ID не найден");
                 List<Url> urls = UrlsRepository.getEntities();
                 var page = new UrlsPage(urls);
@@ -91,7 +90,7 @@ public class UrlsController {
     }
 
     private static void handleUrlNotFound(Context ctx) {
-        ctx.status(404);
+        ctx.status(200);
         ctx.sessionAttribute("flash", "URL-адрес с указанным идентификатором не найден");
         ctx.redirect(NamedRoutes.urlsPath());
     }
