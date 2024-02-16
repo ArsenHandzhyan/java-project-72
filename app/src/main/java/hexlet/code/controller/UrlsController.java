@@ -48,7 +48,7 @@ public class UrlsController {
                 page.setFlash((String) flash);
                 ctx.render("urls/show.jte", Collections.singletonMap("page", page));
             } else {
-                ctx.status(404);
+                ctx.status(200);
                 ctx.sessionAttribute("flash", "URL с указанным ID не найден");
                 List<Url> urls = UrlsRepository.getEntities();
                 var page = new UrlsPage(urls);
