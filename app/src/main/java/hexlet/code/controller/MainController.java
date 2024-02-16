@@ -60,9 +60,9 @@ public class MainController {
     }
 
     private static boolean isValidUrl(URI uri) {
-        return uri.getScheme() != null &&
-                (uri.getScheme().equalsIgnoreCase("http") ||
-                uri.getScheme().equalsIgnoreCase("https"));
+        return uri.getScheme() != null
+                && (uri.getScheme().equalsIgnoreCase("http")
+                || uri.getScheme().equalsIgnoreCase("https"));
     }
 
     private static void handleInvalidUrl(Context ctx, String message) {
