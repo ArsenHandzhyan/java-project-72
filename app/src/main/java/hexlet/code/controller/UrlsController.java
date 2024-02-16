@@ -24,6 +24,7 @@ import java.util.Objects;
 public class UrlsController {
     public static void showAllUrls(Context ctx) {
         try {
+            ctx.status(200);
             List<Url> urls = UrlsRepository.getEntities();
             ctx.attribute("urls", urls);
             var page = new UrlsPage(urls);
