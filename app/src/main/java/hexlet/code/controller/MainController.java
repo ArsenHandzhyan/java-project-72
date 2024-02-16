@@ -3,8 +3,6 @@ package hexlet.code.controller;
 import hexlet.code.dto.MainPage;
 import hexlet.code.dto.UrlsPage;
 import hexlet.code.model.Url;
-import hexlet.code.model.UrlCheck;
-import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
@@ -12,7 +10,6 @@ import io.javalin.http.Context;
 import java.net.URI;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,18 +64,13 @@ public class MainController {
     private static void handleUrlAdded(Context ctx) throws SQLException {
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         List<Url> urls = UrlsRepository.getEntities();
-        List<UrlCheck> urlChecks = new ArrayList<>();
-        for (Url url : urls) {
-            List<UrlCheck> checksForUrl = UrlCheckRepository.findByUrlId(url.getId());
-            urlChecks.addAll(checksForUrl);
-        }
-        renderUrlsPage(ctx, urls, urlChecks);
+        renderUrlsPage(ctx, urls);
     }
 
-    private static void renderUrlsPage(Context ctx, List<Url> urls, List<UrlCheck> urlChecks) {
+    private static void renderUrlsPage(Context ctx, List<Url> urls) {
         var flash = ctx.consumeSessionAttribute("flash");
         ctx.attribute("urls", urls);
-        var page = new UrlsPage(urls, urlChecks);
+        var page = new UrlsPage(urls);
         page.setFlash((String) flash);
         ctx.render("urls/index.jte", Collections.singletonMap("page", page));
     }

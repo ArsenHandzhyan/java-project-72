@@ -48,6 +48,9 @@ public class UrlCheckRepository {
                 urlCheck.setCreatedAt(resultSet.getObject("created_at", LocalDateTime.class));
                 urlChecks.add(urlCheck);
             }
+            if (urlChecks.isEmpty()) {
+                return null; // Если список пустой, возвращаем null
+            }
             return urlChecks;
         }
     }
@@ -63,6 +66,31 @@ public class UrlCheckRepository {
             }
             // Если не удалось получить следующий id, возвращаем значение по умолчанию
             return 1;
+        }
+    }
+
+    public static UrlCheck findLastByUrlId(Long urlId) {
+        String sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY created_at DESC LIMIT 1";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+            preparedStatement.setLong(1, urlId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                UrlCheck urlCheck = new UrlCheck();
+                urlCheck.setId(resultSet.getLong("id"));
+                urlCheck.setUrlId(resultSet.getLong("url_id"));
+                urlCheck.setStatusCode(resultSet.getInt("status_code"));
+                urlCheck.setTitle(resultSet.getString("title"));
+                urlCheck.setH1(resultSet.getString("h1"));
+                urlCheck.setDescription(resultSet.getString("description"));
+                urlCheck.setCreatedAt(resultSet.getObject("created_at", LocalDateTime.class));
+                return urlCheck;
+            }
+            // Возвращаем null, если не найдено ни одной проверки URL
+            return null;
+        } catch (SQLException e) {
+            // В случае исключения возвращаем null или выполняем другую обработку, в зависимости от требований приложения
+            return null;
         }
     }
 }

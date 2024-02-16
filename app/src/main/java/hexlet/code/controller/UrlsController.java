@@ -17,7 +17,6 @@ import org.jsoup.select.Elements;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -26,13 +25,8 @@ public class UrlsController {
     public static void showAllUrls(Context ctx) {
         try {
             List<Url> urls = UrlsRepository.getEntities();
-            List<UrlCheck> urlChecks = new ArrayList<>();
-            for (Url url : urls) {
-                List<UrlCheck> checksForUrl = UrlCheckRepository.findByUrlId(url.getId());
-                urlChecks.addAll(checksForUrl);
-            }
             ctx.attribute("urls", urls);
-            var page = new UrlsPage(urls, urlChecks);
+            var page = new UrlsPage(urls);
             ctx.render("urls/index.jte", Collections.singletonMap("page", page));
         } catch (SQLException e) {
             ctx.status(500);
@@ -56,7 +50,7 @@ public class UrlsController {
                 ctx.status(404);
                 ctx.sessionAttribute("flash", "URL с указанным ID не найден");
                 List<Url> urls = UrlsRepository.getEntities();
-                var page = new UrlsPage(urls, urlChecks);
+                var page = new UrlsPage(urls);
                 var flash = ctx.consumeSessionAttribute("flash");
                 page.setFlash((String) flash);
                 ctx.render("urls/index.jte", Collections.singletonMap("page", page));
