@@ -25,32 +25,26 @@ public class MainController {
 
     public static void addUrl(Context ctx) {
         String inputUrl = ctx.formParam("url");
-
         try {
             assert inputUrl != null;
             URI uri = new URI(inputUrl);
-
             if (uri.getHost() == null || !DomainValidator.getInstance().isValid(uri.getHost())) {
                 handleInvalidUrl(ctx, "Некорректный URL: отсутствует действительный хост");
                 return;
             }
-
             if (!isValidUrl(uri)) {
                 handleInvalidUrl(ctx, "Некорректный URL");
                 return;
             }
-
             String domainWithProtocolAndPort = uri.getScheme() + "://" + uri.getHost();
             if (uri.getPort() != -1) {
                 domainWithProtocolAndPort += ":" + uri.getPort();
             }
-
             Optional<Url> existingUrl = UrlsRepository.findUrlByUrl(domainWithProtocolAndPort);
             if (existingUrl.isPresent()) {
                 handleExistingUrl(ctx);
                 return;
             }
-
             Url url = new Url(domainWithProtocolAndPort, LocalDateTime.now());
             UrlsRepository.save(url);
             handleUrlAdded(ctx);
