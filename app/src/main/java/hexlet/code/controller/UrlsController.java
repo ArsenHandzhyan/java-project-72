@@ -31,6 +31,7 @@ public class UrlsController {
         } catch (SQLException e) {
             ctx.status(500);
             ctx.sessionAttribute("flash", "Произошла ошибка при получении списка URL");
+            ctx.sessionAttribute("flashType", determineFlashType(false));
             ctx.redirect(NamedRoutes.urlsPath());
         }
     }
@@ -45,14 +46,19 @@ public class UrlsController {
                 ctx.attribute("url", url);
                 var page = new UrlPage(url, urlChecks);
                 var flash = ctx.consumeSessionAttribute("flash");
+                var flashType = ctx.consumeSessionAttribute("flashType");
                 page.setFlash((String) flash);
+                page.setFlashType((String) flashType);
                 ctx.render("urls/show.jte", Collections.singletonMap("page", page));
             } else {
                 ctx.sessionAttribute("flash", "URL с указанным ID не найден");
+                ctx.sessionAttribute("flashType", determineFlashType(false));
                 List<Url> urls = UrlsRepository.getEntities();
                 var page = new UrlsPage(urls);
                 var flash = ctx.consumeSessionAttribute("flash");
+                var flashType = ctx.consumeSessionAttribute("flashType");
                 page.setFlash((String) flash);
+                page.setFlashType((String) flashType);
                 ctx.render("urls/index.jte", Collections.singletonMap("page", page));
             }
         } catch (SQLException e) {
@@ -61,9 +67,12 @@ public class UrlsController {
             List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(id);
             ctx.status(500);
             ctx.sessionAttribute("flash", "Произошла ошибка при получении URL по ID");
+            ctx.sessionAttribute("flashType", determineFlashType(false));
             var page = new UrlPage(url, urlChecks);
             var flash = ctx.consumeSessionAttribute("flash");
+            var flashType = ctx.consumeSessionAttribute("flashType");
             page.setFlash((String) flash);
+            page.setFlashType((String) flashType);
             ctx.render("urls/show.jte", Collections.singletonMap("page", page));
         }
     }
@@ -79,7 +88,7 @@ public class UrlsController {
 
             HttpResponse<String> response = sendHttpRequest(url);
             if (response == null) {
-                handleFailedHttpRequest(ctx);
+                handleFailedHttpRequest(ctx, url);
                 return;
             }
 
@@ -92,6 +101,7 @@ public class UrlsController {
     private static void handleUrlNotFound(Context ctx) {
         ctx.status(200);
         ctx.sessionAttribute("flash", "URL-адрес с указанным идентификатором не найден");
+        ctx.sessionAttribute("flashType", determineFlashType(false));
         ctx.redirect(NamedRoutes.urlsPath());
     }
 
@@ -103,9 +113,11 @@ public class UrlsController {
         }
     }
 
-    private static void handleFailedHttpRequest(Context ctx) {
+    private static void handleFailedHttpRequest(Context ctx, Url url) {
         ctx.status(500);
         ctx.sessionAttribute("flash", "Не удалось отправить HTTP-запрос");
+        ctx.sessionAttribute("flashType", determineFlashType(false));
+        ctx.redirect(NamedRoutes.urlPath(url.getId()));
     }
 
     private static void handleSuccessfulHttpRequest(Context ctx, Url url, HttpResponse<String> response)
@@ -144,11 +156,17 @@ public class UrlsController {
 
         ctx.status(201);
         ctx.sessionAttribute("flash", "URL успешно проверен");
+        ctx.sessionAttribute("flashType", determineFlashType(true));
         ctx.redirect(NamedRoutes.urlPath(url.getId()));
     }
 
     private static void handleSQLException(Context ctx) {
         ctx.status(500);
         ctx.sessionAttribute("flash", "Произошла ошибка при проверке URL-адреса.");
+        ctx.sessionAttribute("flashType", determineFlashType(false));
+    }
+
+    private static String determineFlashType(boolean isSuccess) {
+        return isSuccess ? "alert-success" : "alert-danger";
     }
 }
