@@ -55,20 +55,18 @@ public class App {
     }
 
     private static HikariDataSource initializeDataSource() throws SQLException, IOException {
-        String jdbcUrl = System.getenv("jdbc:postgresql://"
-                + "dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres"
-                + ".render.com/new_postgresql_for_javalin");
+        String jdbcUrl = System.getenv("JDBC_URL");
+        String username = System.getenv("DB_USERNAME");
+        String password = System.getenv("DB_PASSWORD");
+
         if (jdbcUrl == null || jdbcUrl.isEmpty()) {
             jdbcUrl = "jdbc:h2:mem:project";
         }
 
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(jdbcUrl);
-
-        if (jdbcUrl.startsWith("jdbc:postgresql://")) {
-            hikariConfig.setUsername("new_postgresql_for_javalin_user");
-            hikariConfig.setPassword("GvGwspqIZhAYD3HDJjbP9QP51RSh5yf9");
-        }
+        hikariConfig.setUsername(username);
+        hikariConfig.setPassword(password);
 
         try {
             var dataSource = createDataSource(hikariConfig);
