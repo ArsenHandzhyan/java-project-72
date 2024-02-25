@@ -18,7 +18,7 @@ content = @`
         <title>Hello Hexlet!</title>
     </head>
     <body>
-    <h1>Список добавленных URL</h1>
+    <h1>Сайты</h1>
     <table class="table">
         <thead>
         <tr>

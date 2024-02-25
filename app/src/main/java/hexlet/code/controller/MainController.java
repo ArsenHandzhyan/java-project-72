@@ -6,7 +6,6 @@ import hexlet.code.model.Url;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
-import org.apache.commons.validator.routines.DomainValidator;
 
 import java.net.URI;
 import java.sql.SQLException;
@@ -30,10 +29,7 @@ public class MainController {
         try {
             assert inputUrl != null;
             URI uri = new URI(inputUrl);
-            if (uri.getHost() == null || !DomainValidator.getInstance().isValid(uri.getHost())) {
-                handleInvalidUrl(ctx, "Некорректный URL: отсутствует действительный хост");
-                return;
-            }
+
             if (!isValidUrl(uri)) {
                 handleInvalidUrl(ctx, "Некорректный URL");
                 return;
@@ -62,14 +58,14 @@ public class MainController {
     }
 
     private static void handleInvalidUrl(Context ctx, String message) {
-        ctx.status(404); // Изменено на 404
+        ctx.status(200);
         ctx.sessionAttribute("flash", message);
         ctx.sessionAttribute("flashType", determineFlashType(false));
         ctx.redirect(NamedRoutes.homePath());
     }
 
     private static void handleExistingUrl(Context ctx) throws SQLException {
-        ctx.status(404); // Изменено на 404
+        ctx.status(200);
         ctx.sessionAttribute("flash", "Страница уже существует");
         ctx.sessionAttribute("flashType", determineFlashType(true));
         List<Url> urls = UrlsRepository.getEntities();
@@ -77,7 +73,7 @@ public class MainController {
     }
 
     private static void handleUrlAdded(Context ctx) throws SQLException {
-        ctx.status(200); // Изменено на 200
+        ctx.status(200);
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flashType", determineFlashType(true));
         List<Url> urls = UrlsRepository.getEntities();

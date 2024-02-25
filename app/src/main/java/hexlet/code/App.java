@@ -51,7 +51,7 @@ public class App {
         app.post(NamedRoutes.homePath(), MainController::addUrl);
         app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
-        app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
+        app.post(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
     }
 
     private static HikariDataSource initializeDataSource() throws SQLException, IOException {

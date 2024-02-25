@@ -18,10 +18,9 @@ content = @`
         <title>Hello Hexlet!</title>
     </head>
     <body>
-    <h1>Просмотр URL</h1>
     @if (page != null && page.getUrl() != null)
+        <h1>Сайт: ${page.getUrl().getName()}</h1>
         <div class="site-info">
-            <h2>Сайт: ${page.getUrl().getName()}</h2>
             <table class="table">
                 <tbody>
                 <tr>
@@ -40,7 +39,9 @@ content = @`
             </table>
         </div>
         <h2>Проверки</h2>
-        <p><a href="${NamedRoutes.checksUrlPath(page.getUrl().getId())}">Запустить проверку</a></p>
+        <form action="${NamedRoutes.checksUrlPath(page.getUrl().getId())}" method="POST">
+            <button type="submit">Запустить проверку</button>
+        </form>
         <table class="table">
             <thead>
             <tr>
