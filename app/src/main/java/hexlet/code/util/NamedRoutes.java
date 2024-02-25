@@ -20,10 +20,6 @@ public class NamedRoutes {
         return "/urls/" + id;
     }
 
-    public static String buildUrlPath() {
-        return "/urls";
-    }
-
     public static String checksUrlPath(Long id) {
         return checksUrlPath(String.valueOf(id));
     }

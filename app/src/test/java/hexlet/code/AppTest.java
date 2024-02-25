@@ -69,6 +69,14 @@ public class AppTest {
     }
 
     @Test
+    void testUrlsPagePost() {
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.post("/urls");
+            assertThat(response.code()).isEqualTo(200);
+        });
+    }
+
+    @Test
     void testUrlPage() throws SQLException {
         var url = new Url("https://example.com", LocalDateTime.now());
         UrlsRepository.save(url);
