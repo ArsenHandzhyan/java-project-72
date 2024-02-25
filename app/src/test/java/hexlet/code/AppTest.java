@@ -113,4 +113,6 @@ public class AppTest {
         AppTestUtils.waitForApp();
         assertThat(UrlCheckRepository.findLastByUrlId(url.getId())).isNull();
     }
+
+
 }

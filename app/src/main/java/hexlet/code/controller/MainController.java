@@ -62,12 +62,14 @@ public class MainController {
     }
 
     private static void handleInvalidUrl(Context ctx, String message) {
+        ctx.status(404); // Изменено на 404
         ctx.sessionAttribute("flash", message);
         ctx.sessionAttribute("flashType", determineFlashType(false));
         ctx.redirect(NamedRoutes.homePath());
     }
 
     private static void handleExistingUrl(Context ctx) throws SQLException {
+        ctx.status(404); // Изменено на 404
         ctx.sessionAttribute("flash", "Страница уже существует");
         ctx.sessionAttribute("flashType", determineFlashType(true));
         List<Url> urls = UrlsRepository.getEntities();
@@ -75,6 +77,7 @@ public class MainController {
     }
 
     private static void handleUrlAdded(Context ctx) throws SQLException {
+        ctx.status(200); // Изменено на 200
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flashType", determineFlashType(true));
         List<Url> urls = UrlsRepository.getEntities();
