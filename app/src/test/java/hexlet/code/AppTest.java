@@ -185,8 +185,6 @@ public class AppTest {
 
     @Test
     void testStore1() {
-
-//        String url = "http://kubernetes.docker.internal:51569";
         String url1 = mockWebServer.url("/").toString().replaceAll("/$", "");
         JavalinTest.test(app, (server, client) -> {
             var requestBody = "url=" + url1;
@@ -276,6 +274,4 @@ public class AppTest {
         AppTestUtils.waitForApp();
         assertThat(UrlCheckRepository.findLastByUrlId(url.getId())).isNull();
     }
-
-
 }

@@ -110,37 +110,9 @@ public class UrlsController {
         }
     }
 
-    private static void handleUrlNotFound(Context ctx) {
-        ctx.status(200);
-        ctx.sessionAttribute("flash", "URL-адрес с указанным идентификатором не найден");
-        ctx.sessionAttribute("flashType", determineFlashType(false));
-        ctx.redirect(NamedRoutes.urlsPath());
-    }
-
-    private static HttpResponse<String> sendHttpRequest(String url) {
-        try {
-            return Unirest.get(url).asString();
-        } catch (UnirestException e) {
-            return null;
-        }
-    }
-
-    private static void handleFailedHttpRequest(Context ctx, Url url) {
-        ctx.status(500);
-        ctx.sessionAttribute("flash", "Не удалось отправить HTTP-запрос");
-        ctx.sessionAttribute("flashType", determineFlashType(false));
-        ctx.redirect(NamedRoutes.urlPath(url.getId()));
-    }
-
     private static void handleSuccessfulHttpRequest(Context ctx, Url url, HttpResponse<String> response)
             throws SQLException {
-
-
         saveUrlCheck(ctx, url, response);
-    }
-
-    private static String getFirstElementText(Elements elements) {
-        return elements.first() != null ? Objects.requireNonNull(elements.first()).text() : "";
     }
 
     private static void saveUrlCheck(Context ctx, Url url, HttpResponse<String> response)
@@ -174,6 +146,30 @@ public class UrlsController {
         ctx.redirect(NamedRoutes.urlPath(url.getId()));
     }
 
+    private static HttpResponse<String> sendHttpRequest(String url) {
+        try {
+            return Unirest.get(url).asString();
+        } catch (UnirestException e) {
+            return null;
+        }
+    }
+    private static void handleUrlNotFound(Context ctx) {
+        ctx.status(200);
+        ctx.sessionAttribute("flash", "URL-адрес с указанным идентификатором не найден");
+        ctx.sessionAttribute("flashType", determineFlashType(false));
+        ctx.redirect(NamedRoutes.urlsPath());
+    }
+
+    private static void handleFailedHttpRequest(Context ctx, Url url) {
+        ctx.status(500);
+        ctx.sessionAttribute("flash", "Не удалось отправить HTTP-запрос");
+        ctx.sessionAttribute("flashType", determineFlashType(false));
+        ctx.redirect(NamedRoutes.urlPath(url.getId()));
+    }
+
+    private static String getFirstElementText(Elements elements) {
+        return elements.first() != null ? Objects.requireNonNull(elements.first()).text() : "";
+    }
     private static boolean isValidUrl(URI uri) {
         return uri.getScheme() != null
                 && (uri.getScheme().equalsIgnoreCase("http")
