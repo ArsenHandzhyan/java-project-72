@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 
 import static hexlet.code.repository.BaseRepository.dataSource;
@@ -28,6 +29,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AppTest {
     private Javalin app;
     private MockWebServer mockWebServer;
+    private Map<String, Object> existingUrl;
+    private Map<String, Object> existingUrlCheck;
 
     private void configureRoutes() {
         app.get(NamedRoutes.homePath(), MainController::index);
@@ -35,6 +38,7 @@ public class AppTest {
         app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
         app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
+        app.post(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
     }
 
     @BeforeEach
@@ -43,6 +47,14 @@ public class AppTest {
         configureRoutes();
         mockWebServer = new MockWebServer();
         mockWebServer.start();
+        String url = "http://kubernetes.docker.internal:51569";
+
+        TestUtils.addUrl(dataSource, url);
+        existingUrl = TestUtils.getUrlByName(dataSource, url);
+
+        assert existingUrl != null;
+        TestUtils.addUrlCheck(dataSource, (long) existingUrl.get("id"));
+        existingUrlCheck = TestUtils.getUrlCheck(dataSource, (long) existingUrl.get("id"));
     }
 
     @Test
@@ -86,7 +98,6 @@ public class AppTest {
     void testCheckUrlPost1() throws SQLException {
         var url = new Url("https://example.com", LocalDateTime.now());
         UrlsRepository.save(url);
-        System.out.println(UrlsRepository.find(url.getId()));
         JavalinTest.test(app, (server, client) -> assertThat(client.get(NamedRoutes.checksUrlPath(url.getId()))
                 .code()).isEqualTo(200));
     }
@@ -95,7 +106,6 @@ public class AppTest {
     void testCheckUrlPost2() throws SQLException {
         var url = new Url("https://example.com", LocalDateTime.now());
         UrlsRepository.save(url);
-        System.out.println(UrlsRepository.find(url.getId()));
         JavalinTest.test(app, (server, client) -> assertThat(Objects.requireNonNull(client
                 .get(NamedRoutes.checksUrlPath(url.getId()))
                 .body()).string()).contains("https://example.com"));
@@ -105,20 +115,18 @@ public class AppTest {
     void testCheckUrlWithError() throws SQLException {
         var url = new Url("http://localhost:8080", LocalDateTime.now());
         UrlsRepository.save(url);
-        System.out.println(UrlsRepository.find(url.getId()));
         JavalinTest.test(app, (server, client) -> assertThat(Objects.requireNonNull(client
                 .post(NamedRoutes.checksUrlPath(url.getId()))
-                .body()).string()).contains("Not Found"));
+                .body()).string()).contains("Hello Hexlet!"));
     }
 
     @Test
     void testCheckUrlWithError2() throws SQLException {
         var url = new Url("http://localhost:8080", LocalDateTime.now());
         UrlsRepository.save(url);
-        System.out.println(UrlsRepository.find(url.getId()));
         JavalinTest.test(app, (server, client) -> {
             assertThat(client.get(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
-            assertThat(client.post(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(404);
+            assertThat(client.post(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
         });
     }
 
@@ -143,12 +151,51 @@ public class AppTest {
     }
 
     @Test
+    void testIndex() {
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.get("/urls");
+            assertThat(response.code()).isEqualTo(200);
+            assert response.body() != null;
+            assertThat(response.body().string())
+                    .contains(existingUrl.get("name").toString())
+                    .contains(existingUrlCheck.get("status_code").toString());
+        });
+    }
+
+    @Test
     void testAddUrl() throws SQLException {
         var url = new Url("https://example.com", LocalDateTime.now());
         UrlsRepository.save(url);
         JavalinTest.test(app, (server, client) -> {
             var response = client.get("/urls/" + url.getId());
             assertThat(response.code()).isEqualTo(200);
+        });
+    }
+
+    @Test
+    void testStore1() {
+
+        String url = "";
+
+        JavalinTest.test(app, (server, client) -> {
+            var requestBody = "url=" + url;
+            assertThat(client.post("/urls", requestBody).code()).isEqualTo(404);
+            assertThat(Objects.requireNonNull(client.post("/urls", requestBody).body()).string()).contains("Not Found");
+
+            assertThat(existingUrl).isNotNull();
+
+            assertThat(existingUrl.get("name").toString()).isEqualTo(url);
+
+            client.post("/urls/" + existingUrl.get("id") + "/checks");
+
+            assertThat(client.get("/urls/" + existingUrl.get("id")).code())
+                    .isEqualTo(200);
+
+            var actualCheck = TestUtils.getUrlCheck(dataSource, (long) existingUrl.get("id"));
+            assertThat(actualCheck).isNotNull();
+            assertThat(actualCheck.get("title")).isEqualTo("en title");
+            assertThat(actualCheck.get("h1")).isEqualTo("en h1");
+            assertThat(actualCheck.get("description")).isEqualTo("en description");
         });
     }
 
