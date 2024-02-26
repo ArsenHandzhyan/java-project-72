@@ -99,7 +99,8 @@ public class AppTest {
     void testCheckUrlPost1() throws SQLException {
         var url = new Url("https://example.com", LocalDateTime.now());
         UrlsRepository.save(url);
-        JavalinTest.test(app, (server, client) -> assertThat(client.get(NamedRoutes.checksUrlPath(url.getId()))
+        JavalinTest.test(app, (server, client) -> assertThat(client.get(NamedRoutes
+                .checksUrlPath(url.getId()))
                 .code()).isEqualTo(200));
     }
 
@@ -128,8 +129,10 @@ public class AppTest {
         JavalinTest.test(app, (server, client) -> {
             assertThat(client.get(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
             assertThat(client.post(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
-            assertThat(Objects.requireNonNull(client.post(NamedRoutes.checksUrlPath(url.getId())).body()).string()).contains("Запустить проверку");
-            assertThat(Objects.requireNonNull(client.get(NamedRoutes.checksUrlPath(url.getId())).body()).string()).contains("Запустить проверку");
+            assertThat(Objects.requireNonNull(client.post(NamedRoutes.checksUrlPath(url.getId()))
+                                              .body()).string()).contains("Запустить проверку");
+            assertThat(Objects.requireNonNull(client.get(NamedRoutes.checksUrlPath(url.getId()))
+                                              .body()).string()).contains("Запустить проверку");
 
         });
     }
@@ -189,7 +192,8 @@ public class AppTest {
         JavalinTest.test(app, (server, client) -> {
             var requestBody = "url=" + url;
             assertThat(client.post("/urls", requestBody).code()).isEqualTo(200);
-            assertThat(Objects.requireNonNull(client.post("/urls", requestBody).body()).string()).contains("Hello Hexlet!");
+            assertThat(Objects.requireNonNull(client.post("/urls", requestBody)
+                                              .body()).string()).contains("Hello Hexlet!");
 
             assertThat(existingUrl).isNotNull();
 
