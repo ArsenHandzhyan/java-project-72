@@ -48,7 +48,7 @@ public class AppTest {
         configureRoutes();
         mockWebServer = new MockWebServer();
         mockWebServer.start();
-        String url = "http://kubernetes.docker.internal:51569";
+        String url = mockWebServer.url("/").toString().replaceAll("/$", "");
 
         TestUtils.addUrl(dataSource, url);
         existingUrl = TestUtils.getUrlByName(dataSource, url);
@@ -128,8 +128,10 @@ public class AppTest {
         JavalinTest.test(app, (server, client) -> {
             assertThat(client.get(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
             assertThat(client.post(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
-            assertThat(Objects.requireNonNull(client.post(NamedRoutes.checksUrlPath(url.getId())).body()).string()).contains("Запустить проверку");
-            assertThat(Objects.requireNonNull(client.get(NamedRoutes.checksUrlPath(url.getId())).body()).string()).contains("Запустить проверку");
+            assertThat(Objects.requireNonNull(client.post(NamedRoutes.checksUrlPath(url.getId()))
+                    .body()).string()).contains("Запустить проверку");
+            assertThat(Objects.requireNonNull(client.get(NamedRoutes.checksUrlPath(url.getId()))
+                    .body()).string()).contains("Запустить проверку");
 
         });
     }
@@ -184,16 +186,17 @@ public class AppTest {
     @Test
     void testStore1() {
 
-        String url = "http://kubernetes.docker.internal:51569";
-
+//        String url = "http://kubernetes.docker.internal:51569";
+        String url1 = mockWebServer.url("/").toString().replaceAll("/$", "");
         JavalinTest.test(app, (server, client) -> {
-            var requestBody = "url=" + url;
+            var requestBody = "url=" + url1;
             assertThat(client.post("/urls", requestBody).code()).isEqualTo(200);
-            assertThat(Objects.requireNonNull(client.post("/urls", requestBody).body()).string()).contains("Hello Hexlet!");
+            assertThat(Objects.requireNonNull(client.post("/urls", requestBody)
+                    .body()).string()).contains("Hello Hexlet!");
 
             assertThat(existingUrl).isNotNull();
 
-            assertThat(existingUrl.get("name").toString()).isEqualTo(url);
+            assertThat(existingUrl.get("name").toString()).isEqualTo(url1);
 
             client.post("/urls/" + existingUrl.get("id") + "/checks");
 
@@ -205,6 +208,28 @@ public class AppTest {
             assertThat(actualCheck.get("title")).isEqualTo("en title");
             assertThat(actualCheck.get("h1")).isEqualTo("en h1");
             assertThat(actualCheck.get("description")).isEqualTo("en description");
+        });
+    }
+
+    @Test
+    void testStore2() throws SQLException {
+
+        String inputUrl = "https://ru.hexlet.io";
+        var url = new Url("https://ru.hexlet.io", LocalDateTime.now());
+        UrlsRepository.save(url);
+        JavalinTest.test(app, (server, client) -> {
+            var requestBody = "url=" + inputUrl;
+            assertThat(client.post("/urls", requestBody).code()).isEqualTo(200);
+
+            var response = client.get("/urls");
+            assertThat(response.code()).isEqualTo(200);
+            assert response.body() != null;
+            assertThat(response.body().string())
+                    .contains(inputUrl);
+
+            var actualUrl = TestUtils.getUrlByName(dataSource, inputUrl);
+            assertThat(actualUrl).isNotNull();
+            assertThat(actualUrl.get("name").toString()).isEqualTo(inputUrl);
         });
     }
 
