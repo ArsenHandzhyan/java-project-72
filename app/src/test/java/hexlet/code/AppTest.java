@@ -127,6 +127,9 @@ public class AppTest {
         JavalinTest.test(app, (server, client) -> {
             assertThat(client.get(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
             assertThat(client.post(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
+            assertThat(Objects.requireNonNull(client.post(NamedRoutes.checksUrlPath(url.getId())).body()).string()).contains("Запустить проверку");
+            assertThat(Objects.requireNonNull(client.get(NamedRoutes.checksUrlPath(url.getId())).body()).string()).contains("Запустить проверку");
+
         });
     }
 
@@ -139,6 +142,11 @@ public class AppTest {
         JavalinTest.test(app, (server, client) -> {
             var response = client.get("/urls/" + url.getId());
             assertThat(response.code()).isEqualTo(200);
+            assert response.body() != null;
+            assertThat(response.body().string())
+                    .contains("Hello Hexlet!");
+            assertThat(response.headers().toString())
+                    .contains("Date");
         });
     }
 
