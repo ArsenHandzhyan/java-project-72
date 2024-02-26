@@ -36,6 +36,7 @@ public class AppTest {
         app.get(NamedRoutes.homePath(), MainController::index);
         app.post(NamedRoutes.homePath(), MainController::addUrl);
         app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
+        app.post(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
         app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
         app.post(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
@@ -187,8 +188,8 @@ public class AppTest {
 
         JavalinTest.test(app, (server, client) -> {
             var requestBody = "url=" + url;
-            assertThat(client.post("/urls", requestBody).code()).isEqualTo(404);
-            assertThat(Objects.requireNonNull(client.post("/urls", requestBody).body()).string()).contains("Not Found");
+            assertThat(client.post("/urls", requestBody).code()).isEqualTo(200);
+            assertThat(Objects.requireNonNull(client.post("/urls", requestBody).body()).string()).contains("Hello Hexlet!");
 
             assertThat(existingUrl).isNotNull();
 
@@ -221,7 +222,7 @@ public class AppTest {
             assert actualUrl != null;
             assertThat(actualUrl.get("name").toString()).isEqualTo(inputUrl);
 
-            assertThat(client.post("/urls", requestBody).code()).isEqualTo(404);
+            assertThat(client.post("/urls", requestBody).code()).isEqualTo(200);
 
             var response = client.get("/urls");
             assertThat(response.code()).isEqualTo(200);
