@@ -175,7 +175,7 @@ public class AppTest {
     @Test
     void testStore1() {
 
-        String url = "";
+        String url = "http://kubernetes.docker.internal:51569";
 
         JavalinTest.test(app, (server, client) -> {
             var requestBody = "url=" + url;
