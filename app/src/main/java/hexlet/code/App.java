@@ -62,18 +62,7 @@ public class App {
         String password = System.getenv("DB_PASSWORD");
 
         if (jdbcUrl == null || jdbcUrl.isEmpty()) {
-            LOGGER.error("JDBC_URL environment variable is not set. Aborting...");
-            throw new IllegalArgumentException("JDBC_URL environment variable is not set");
-        }
-
-        if (username == null || username.isEmpty()) {
-            LOGGER.error("DB_USERNAME environment variable is not set. Aborting...");
-            throw new IllegalArgumentException("DB_USERNAME environment variable is not set");
-        }
-
-        if (password == null || password.isEmpty()) {
-            LOGGER.error("DB_PASSWORD environment variable is not set. Aborting...");
-            throw new IllegalArgumentException("DB_PASSWORD environment variable is not set");
+            jdbcUrl = "jdbc:h2:mem:project";
         }
 
         HikariConfig hikariConfig = new HikariConfig();
