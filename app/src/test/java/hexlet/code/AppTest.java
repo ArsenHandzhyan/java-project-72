@@ -58,6 +58,12 @@ public class AppTest {
         existingUrlCheck = TestUtils.getUrlCheck(dataSource, (long) existingUrl.get("id"));
     }
 
+    @AfterEach
+    public void tearDown() throws IOException {
+        mockWebServer.shutdown();
+        App.stopApp();
+    }
+
     @Test
     void testH2Connection() throws SQLException {
         Connection connection = DriverManager.getConnection("jdbc:h2:mem:project");
@@ -99,7 +105,7 @@ public class AppTest {
     void testCheckUrlPost1() throws SQLException {
         var url = new Url("https://example.com", LocalDateTime.now());
         UrlsRepository.save(url);
-        JavalinTest.test(app, (server, client) -> assertThat(client.get(NamedRoutes.checksUrlPath(url.getId()))
+        JavalinTest.test(app, (server, client) -> assertThat(client.post(NamedRoutes.checksUrlPath(url.getId()))
                 .code()).isEqualTo(200));
     }
 
@@ -108,7 +114,7 @@ public class AppTest {
         var url = new Url("https://example.com", LocalDateTime.now());
         UrlsRepository.save(url);
         JavalinTest.test(app, (server, client) -> assertThat(Objects.requireNonNull(client
-                .get(NamedRoutes.checksUrlPath(url.getId()))
+                .post(NamedRoutes.checksUrlPath(url.getId()))
                 .body()).string()).contains("https://example.com"));
     }
 
@@ -127,12 +133,19 @@ public class AppTest {
         UrlsRepository.save(url);
         JavalinTest.test(app, (server, client) -> {
             assertThat(client.get(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
-            assertThat(client.post(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
             assertThat(Objects.requireNonNull(client.post(NamedRoutes.checksUrlPath(url.getId()))
                     .body()).string()).contains("Запустить проверку");
+        });
+    }
+
+    @Test
+    void testCheckUrlWithError3() throws SQLException {
+        var url = new Url("http://localhost:8080", LocalDateTime.now());
+        UrlsRepository.save(url);
+        JavalinTest.test(app, (server, client) -> {
+            assertThat(client.post(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
             assertThat(Objects.requireNonNull(client.get(NamedRoutes.checksUrlPath(url.getId()))
                     .body()).string()).contains("Запустить проверку");
-
         });
     }
 
@@ -259,12 +272,6 @@ public class AppTest {
         });
     }
 
-    @AfterEach
-    public void tearDown() throws IOException {
-        mockWebServer.shutdown();
-        App.stopApp();
-    }
-
     @Test
     void testFailedHttpRequest() throws SQLException {
         // Тест обработки ситуации, когда HTTP-запрос завершается неудачей
@@ -273,5 +280,29 @@ public class AppTest {
         mockWebServer.enqueue(new MockResponse().setResponseCode(500));
         AppTestUtils.waitForApp();
         assertThat(UrlCheckRepository.findLastByUrlId(url.getId())).isNull();
+    }
+
+    @Test
+    void testIndex2() {
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.get("/urls");
+            assertThat(response.code()).isEqualTo(200);
+            assert response.body() != null;
+            assertThat(response.body().string())
+                    .contains(existingUrl.get("name").toString())
+                    .contains(existingUrlCheck.get("status_code").toString());
+        });
+    }
+
+    @Test
+    void testShow() {
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.get("/urls/" + existingUrl.get("id"));
+            assertThat(response.code()).isEqualTo(200);
+            assert response.body() != null;
+            assertThat(response.body().string())
+                    .contains(existingUrl.get("name").toString())
+                    .contains(existingUrlCheck.get("status_code").toString());
+        });
     }
 }

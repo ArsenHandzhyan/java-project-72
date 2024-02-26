@@ -162,7 +162,7 @@ public class UrlsController {
 
     private static void handleFailedHttpRequest(Context ctx, Url url) {
         ctx.status(500);
-        ctx.sessionAttribute("flash", "Не удалось отправить HTTP-запрос");
+        ctx.sessionAttribute("flash", "Не удалось выполнить HTTP-запрос");
         ctx.sessionAttribute("flashType", determineFlashType(false));
         ctx.redirect(NamedRoutes.urlPath(url.getId()));
     }
