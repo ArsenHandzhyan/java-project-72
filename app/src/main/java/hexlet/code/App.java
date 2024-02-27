@@ -56,7 +56,7 @@ public class App {
     }
 
     private static HikariDataSource initializeDataSource() throws SQLException, IOException {
-        String jdbcUrl = System.getenv("JDBC_URL");
+        String jdbcUrl = System.getenv("JDBC_DATABASE_URL");
         String username = System.getenv("DB_USERNAME");
         String password = System.getenv("DB_PASSWORD");
 
