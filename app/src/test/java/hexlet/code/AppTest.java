@@ -34,9 +34,11 @@ public class AppTest {
 
     private void configureRoutes() {
         app.get(NamedRoutes.homePath(), MainController::index);
+        app.post(NamedRoutes.homePath(), MainController::addUrl);
         app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
         app.post(NamedRoutes.urlsPath(), MainController::addUrl);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
+        app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
         app.post(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
     }
 
