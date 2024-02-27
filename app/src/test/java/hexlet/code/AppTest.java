@@ -36,7 +36,7 @@ public class AppTest {
         app.get(NamedRoutes.homePath(), MainController::index);
         app.post(NamedRoutes.homePath(), MainController::addUrl);
         app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
-        app.post(NamedRoutes.urlsPath(), MainController::addUrl);
+        app.post(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
         app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
         app.post(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
@@ -94,7 +94,7 @@ public class AppTest {
         var url = new Url("https://example.com", LocalDateTime.now());
         UrlsRepository.save(url);
         JavalinTest.test(app, (server, client) -> {
-            var response = client.post(NamedRoutes.checksUrlPath(url.getId()));
+            var response = client.get(NamedRoutes.checksUrlPath(url.getId()));
             assertThat(response.code()).isEqualTo(200);
             assert response.body() != null;
             assertThat(response.body().string()).contains("Example Domain");
@@ -132,7 +132,7 @@ public class AppTest {
         var url = new Url("http://localhost:8080", LocalDateTime.now());
         UrlsRepository.save(url);
         JavalinTest.test(app, (server, client) -> {
-            assertThat(client.post(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
+            assertThat(client.get(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
             assertThat(Objects.requireNonNull(client.post(NamedRoutes.checksUrlPath(url.getId()))
                     .body()).string()).contains("Запустить проверку");
         });
@@ -144,7 +144,7 @@ public class AppTest {
         UrlsRepository.save(url);
         JavalinTest.test(app, (server, client) -> {
             assertThat(client.post(NamedRoutes.checksUrlPath(url.getId())).code()).isEqualTo(200);
-            assertThat(Objects.requireNonNull(client.post(NamedRoutes.checksUrlPath(url.getId()))
+            assertThat(Objects.requireNonNull(client.get(NamedRoutes.checksUrlPath(url.getId()))
                     .body()).string()).contains("Запустить проверку");
         });
     }
@@ -240,6 +240,34 @@ public class AppTest {
 
             var actualUrl = TestUtils.getUrlByName(dataSource, inputUrl);
             assertThat(actualUrl).isNotNull();
+            assertThat(actualUrl.get("name").toString()).isEqualTo(inputUrl);
+        });
+    }
+
+
+    @Test
+    void testStore() {
+
+        String inputUrl = "https://ru.hexlet.io";
+
+        JavalinTest.test(app, (server, client) -> {
+            var requestBody = "url=" + inputUrl;
+            assertThat(client.post("/", requestBody).code()).isEqualTo(200);
+
+            var actualUrl = TestUtils.getUrlByName(dataSource, inputUrl);
+            assert actualUrl != null;
+            assertThat(actualUrl.get("name").toString()).isEqualTo(inputUrl);
+
+            assertThat(client.post("/urls", requestBody).code()).isEqualTo(200);
+
+            var response = client.get("/urls");
+            assertThat(response.code()).isEqualTo(200);
+            assert response.body() != null;
+            assertThat(response.body().string())
+                    .contains(inputUrl);
+
+            var actualUrl2 = TestUtils.getUrlByName(dataSource, inputUrl);
+            assertThat(actualUrl2).isNotNull();
             assertThat(actualUrl.get("name").toString()).isEqualTo(inputUrl);
         });
     }

@@ -31,8 +31,7 @@ public class App {
     public static void startApp() throws SQLException, IOException {
         app = getApp();
         configureRoutes();
-        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
-        app.start(port);
+        app.start(app.port());
     }
 
     public static void stopApp() {
@@ -51,7 +50,7 @@ public class App {
         app.get(NamedRoutes.homePath(), MainController::index);
         app.post(NamedRoutes.homePath(), MainController::addUrl);
         app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
-        app.post(NamedRoutes.urlsPath(), MainController::addUrl);
+        app.post(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
         app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
         app.post(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
