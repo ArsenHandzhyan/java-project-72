@@ -67,6 +67,7 @@ public class App {
         hikariConfig.setJdbcUrl(jdbcUrl);
         hikariConfig.setUsername(username);
         hikariConfig.setPassword(password);
+        hikariConfig.setMaximumPoolSize(10);
 
         try {
             var dataSource = createDataSource(hikariConfig);
