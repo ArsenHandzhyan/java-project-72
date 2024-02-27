@@ -31,7 +31,8 @@ public class App {
     public static void startApp() throws SQLException, IOException {
         app = getApp();
         configureRoutes();
-        app.start(app.port());
+        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
+        app.start(port);
     }
 
     public static void stopApp() {
