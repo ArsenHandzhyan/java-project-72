@@ -34,9 +34,8 @@ public class AppTest {
 
     private void configureRoutes() {
         app.get(NamedRoutes.homePath(), MainController::index);
-        app.post(NamedRoutes.homePath(), MainController::addUrl);
         app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
-        app.post(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
+        app.post(NamedRoutes.urlsPath(), MainController::addUrl);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
         app.post(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
     }
@@ -239,34 +238,6 @@ public class AppTest {
 
             var actualUrl = TestUtils.getUrlByName(dataSource, inputUrl);
             assertThat(actualUrl).isNotNull();
-            assertThat(actualUrl.get("name").toString()).isEqualTo(inputUrl);
-        });
-    }
-
-
-    @Test
-    void testStore() {
-
-        String inputUrl = "https://ru.hexlet.io";
-
-        JavalinTest.test(app, (server, client) -> {
-            var requestBody = "url=" + inputUrl;
-            assertThat(client.post("/", requestBody).code()).isEqualTo(200);
-
-            var actualUrl = TestUtils.getUrlByName(dataSource, inputUrl);
-            assert actualUrl != null;
-            assertThat(actualUrl.get("name").toString()).isEqualTo(inputUrl);
-
-            assertThat(client.post("/urls", requestBody).code()).isEqualTo(200);
-
-            var response = client.get("/urls");
-            assertThat(response.code()).isEqualTo(200);
-            assert response.body() != null;
-            assertThat(response.body().string())
-                    .contains(inputUrl);
-
-            var actualUrl2 = TestUtils.getUrlByName(dataSource, inputUrl);
-            assertThat(actualUrl2).isNotNull();
             assertThat(actualUrl.get("name").toString()).isEqualTo(inputUrl);
         });
     }
