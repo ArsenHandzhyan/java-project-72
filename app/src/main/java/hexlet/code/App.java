@@ -22,14 +22,21 @@ import java.util.stream.Collectors;
 
 public class App {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
-    private static Javalin app;
 
     public static void main(String[] args) throws SQLException, IOException {
-        startApp();
+        getApp();
     }
 
-    public static void startApp() throws SQLException, IOException {
-        app = getApp();
+    public static Javalin getApp() throws SQLException, IOException {
+        BaseRepository.dataSource = initializeDataSource();
+        JavalinJte.init(createTemplateEngine());
+        Javalin app = Javalin.create();
+        configureRoutes(app);
+        app.start(app.port());
+        return app;
+    }
+
+    private static void configureRoutes(Javalin app) {
         app.get(NamedRoutes.homePath(), MainController::index);
         app.post(NamedRoutes.homePath(), MainController::addUrl);
         app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
@@ -37,19 +44,6 @@ public class App {
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
         app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
         app.post(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
-        app.start(app.port());
-    }
-
-    public static void stopApp() {
-        if (app != null) {
-            app.stop();
-        }
-    }
-
-    public static Javalin getApp() throws SQLException, IOException {
-        BaseRepository.dataSource = initializeDataSource();
-        JavalinJte.init(createTemplateEngine());
-        return Javalin.create();
     }
 
     private static HikariDataSource initializeDataSource() throws SQLException, IOException {
