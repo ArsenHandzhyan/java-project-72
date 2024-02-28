@@ -58,8 +58,8 @@ public class App {
 
     private static HikariDataSource initializeDataSource() throws SQLException, IOException {
         String jdbcUrl = System.getenv("JDBC_DATABASE_URL");
-        String username = System.getenv("user");
-        String password = System.getenv("password");
+        String username = System.getenv("DB_USERNAME");
+        String password = System.getenv("DB_PASSWORD");
 
         if (jdbcUrl == null || jdbcUrl.isEmpty()) {
             jdbcUrl = "jdbc:h2:mem:project";
