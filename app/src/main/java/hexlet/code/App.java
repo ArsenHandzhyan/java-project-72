@@ -35,6 +35,9 @@ public class App {
     public static void stopApp(Javalin app) {
         if (app != null) {
             app.stop();
+            if (BaseRepository.dataSource != null) {
+                BaseRepository.dataSource.close();
+            }
         }
     }
 
