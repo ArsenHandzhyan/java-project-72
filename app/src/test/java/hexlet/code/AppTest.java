@@ -1,7 +1,5 @@
 package hexlet.code;
 
-import hexlet.code.controller.MainController;
-import hexlet.code.controller.UrlsController;
 import hexlet.code.model.Url;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlsRepository;
@@ -32,20 +30,9 @@ public class AppTest {
     private Map<String, Object> existingUrl;
     private Map<String, Object> existingUrlCheck;
 
-    private void configureRoutes() {
-        app.get(NamedRoutes.homePath(), MainController::index);
-        app.post(NamedRoutes.homePath(), MainController::addUrl);
-        app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
-        app.post(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
-        app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
-        app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
-        app.post(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
-    }
-
     @BeforeEach
     public void setUp() throws SQLException, IOException {
         app = App.getApp();
-        configureRoutes();
         mockWebServer = new MockWebServer();
         mockWebServer.start();
         String url = mockWebServer.url("/").toString().replaceAll("/$", "");
@@ -61,7 +48,7 @@ public class AppTest {
     @AfterEach
     public void tearDown() throws IOException {
         mockWebServer.shutdown();
-        App.stopApp();
+        App.stopApp(app);
     }
 
     @Test

@@ -24,15 +24,25 @@ public class App {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) throws SQLException, IOException {
-        getApp();
+        startApp();
+    }
+
+    public static void startApp() throws SQLException, IOException {
+        Javalin app = getApp();
+        app.start(app.port());
+    }
+
+    public static void stopApp(Javalin app) {
+        if (app != null) {
+            app.stop();
+        }
     }
 
     public static Javalin getApp() throws SQLException, IOException {
         BaseRepository.dataSource = initializeDataSource();
         JavalinJte.init(createTemplateEngine());
         Javalin app = Javalin.create();
-        configureRoutes(app);
-        app.start(app.port());
+        configureRoutes(app); // Передаем созданный объект Javalin в метод configureRoutes
         return app;
     }
 
