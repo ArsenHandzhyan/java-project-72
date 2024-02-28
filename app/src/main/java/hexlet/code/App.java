@@ -30,7 +30,13 @@ public class App {
 
     public static void startApp() throws SQLException, IOException {
         app = getApp();
-        configureRoutes();
+        app.get(NamedRoutes.homePath(), MainController::index);
+        app.post(NamedRoutes.homePath(), MainController::addUrl);
+        app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
+        app.post(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
+        app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
+        app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
+        app.post(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
         app.start(app.port());
     }
 
@@ -44,16 +50,6 @@ public class App {
         BaseRepository.dataSource = initializeDataSource();
         JavalinJte.init(createTemplateEngine());
         return Javalin.create();
-    }
-
-    private static void configureRoutes() {
-        app.get(NamedRoutes.homePath(), MainController::index);
-        app.post(NamedRoutes.homePath(), MainController::addUrl);
-        app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
-        app.post(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
-        app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
-        app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
-        app.post(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
     }
 
     private static HikariDataSource initializeDataSource() throws SQLException, IOException {

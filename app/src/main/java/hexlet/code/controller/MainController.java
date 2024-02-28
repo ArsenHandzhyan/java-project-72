@@ -52,7 +52,7 @@ public class MainController {
     }
 
     private static boolean isValidUrl(URI uri) {
-        return uri.getScheme() != null
+        return uri.getScheme() != null && uri.getHost() != null
                 && (uri.getScheme().equalsIgnoreCase("http")
                 || uri.getScheme().equalsIgnoreCase("https"));
     }
