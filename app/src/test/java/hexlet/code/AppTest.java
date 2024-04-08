@@ -17,31 +17,19 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Objects;
 
-import static hexlet.code.repository.BaseRepository.dataSource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AppTest {
     private Javalin app;
     private MockWebServer mockWebServer;
-    private Map<String, Object> existingUrl;
-    private Map<String, Object> existingUrlCheck;
 
     @BeforeEach
     public void setUp() throws SQLException, IOException {
         app = App.getApp();
         mockWebServer = new MockWebServer();
         mockWebServer.start();
-        String url = mockWebServer.url("/").toString().replaceAll("/$", "");
-
-        TestUtils.addUrl(dataSource, url);
-        existingUrl = TestUtils.getUrlByName(dataSource, url);
-
-        assert existingUrl != null;
-        TestUtils.addUrlCheck(dataSource, (long) existingUrl.get("id"));
-        existingUrlCheck = TestUtils.getUrlCheck(dataSource, (long) existingUrl.get("id"));
     }
 
     @AfterEach
@@ -161,14 +149,15 @@ public class AppTest {
     }
 
     @Test
-    void testIndex() {
+    public void testIndex() {
         JavalinTest.test(app, (server, client) -> {
-            var response = client.get("/urls");
+            var url = new Url("https://example.com", LocalDateTime.now());
+            UrlsRepository.save(url);
+            var response = client.get(NamedRoutes.urlsPath());
             assertThat(response.code()).isEqualTo(200);
             assert response.body() != null;
             assertThat(response.body().string())
-                    .contains(existingUrl.get("name").toString())
-                    .contains(existingUrlCheck.get("status_code").toString());
+                    .contains("https://example.com");
         });
     }
 
