@@ -54,7 +54,7 @@ content = @`
     </body>
 `,
 footer = @`
-    <p><a href="${NamedRoutes.urlsPath()}">Главная</a></p>
+    <p><a href="${NamedRoutes.homePath()}">Главная</a></p>
     <p><a href="https://github.com/ArsenHandzhyan">github аккаунт</a></p>
 `
 )
