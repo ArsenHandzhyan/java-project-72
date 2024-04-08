@@ -18,6 +18,7 @@ import org.jsoup.select.Elements;
 
 import java.net.URI;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -132,6 +133,7 @@ public class UrlsController {
         urlCheck.setId(urlCheckId);
         urlCheck.setUrlId(url.getId());
         urlCheck.setStatusCode(statusCode);
+        urlCheck.setCreatedAt(LocalDateTime.now());
         urlCheck.setTitle(title);
         urlCheck.setH1(h1);
         urlCheck.setDescription(description);
