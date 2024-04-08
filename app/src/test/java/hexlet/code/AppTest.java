@@ -1,7 +1,6 @@
 package hexlet.code;
 
 import hexlet.code.model.Url;
-import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
