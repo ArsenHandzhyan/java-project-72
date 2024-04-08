@@ -45,12 +45,7 @@ public class UrlsController {
             ctx.status(200);
             if (url != null) {
                 ctx.attribute("url", url);
-                var page = new UrlPage(url, urlChecks);
-                var flash = ctx.consumeSessionAttribute("flash");
-                var flashType = ctx.consumeSessionAttribute("flashType");
-                page.setFlash((String) flash);
-                page.setFlashType((String) flashType);
-                ctx.render("urls/show.jte", Collections.singletonMap("page", page));
+                getPage(ctx, url, urlChecks);
             } else {
                 ctx.sessionAttribute("flash", "URL с указанным ID не найден");
                 ctx.sessionAttribute("flashType", determineFlashType(false));
@@ -69,13 +64,17 @@ public class UrlsController {
             ctx.status(500);
             ctx.sessionAttribute("flash", "Произошла ошибка при получении URL по ID");
             ctx.sessionAttribute("flashType", determineFlashType(false));
-            var page = new UrlPage(url, urlChecks);
-            var flash = ctx.consumeSessionAttribute("flash");
-            var flashType = ctx.consumeSessionAttribute("flashType");
-            page.setFlash((String) flash);
-            page.setFlashType((String) flashType);
-            ctx.render("urls/show.jte", Collections.singletonMap("page", page));
+            getPage(ctx, url, urlChecks);
         }
+    }
+
+    private static void getPage(Context ctx, Url url, List<UrlCheck> urlChecks) {
+        var page = new UrlPage(url, urlChecks);
+        var flash = ctx.consumeSessionAttribute("flash");
+        var flashType = ctx.consumeSessionAttribute("flashType");
+        page.setFlash((String) flash);
+        page.setFlashType((String) flashType);
+        ctx.render("urls/show.jte", Collections.singletonMap("page", page));
     }
 
     public static void checkUrl(Context ctx) {
