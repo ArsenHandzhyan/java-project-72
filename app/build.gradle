@@ -20,7 +20,6 @@ dependencies {
     // Javalin and related dependencies
     implementation("io.javalin:javalin:5.6.3")
     implementation("io.javalin:javalin-rendering:5.6.3")
-    implementation("com.example:javalin-jte:1.0.0")
 
     // Thymeleaf and related dependencies
     implementation 'org.thymeleaf:thymeleaf:3.0.15.RELEASE'
