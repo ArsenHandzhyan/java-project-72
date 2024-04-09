@@ -18,8 +18,10 @@ repositories {
 
 dependencies {
     // Javalin and related dependencies
-    implementation("io.javalin:javalin:5.6.3")
-    implementation("io.javalin:javalin-rendering:5.6.3")
+    implementation 'io.javalin:javalin:5.6.3'
+    implementation 'io.javalin:javalin-rendering:5.6.3'
+    implementation 'io.javalin.community.ssl:ssl-plugin:5.4.2'
+
 
     // Thymeleaf and related dependencies
     implementation 'org.thymeleaf:thymeleaf:3.0.15.RELEASE'
@@ -56,7 +58,6 @@ dependencies {
     implementation 'com.konghq:unirest-java:3.14.5'
 
     // Test dependencies
-    testImplementation("io.javalin:javalin:5.6.3")
     testImplementation 'io.javalin:javalin-testtools:5.6.3'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.1'
@@ -97,7 +98,6 @@ test {
         events = [TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED]
         showStandardStreams = true
     }
-    classpath = sourceSets.test.runtimeClasspath
 }
 
 jacocoTestReport {
