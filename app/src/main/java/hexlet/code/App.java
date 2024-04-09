@@ -43,8 +43,8 @@ public class App {
 
     public static Javalin getApp() throws SQLException, IOException {
         BaseRepository.dataSource = initializeDataSource();
-        JavalinJte.init(createTemplateEngine());
-        Javalin app = Javalin.create(config -> config.fileRenderer(new JavalinJte(createTemplateEngine())));
+        TemplateEngine templateEngine = createTemplateEngine();
+        Javalin app = Javalin.create(config -> config.fileRenderer(new JavalinJte(templateEngine)));
         configureRoutes(app);
         return app;
     }
@@ -67,9 +67,14 @@ public class App {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(jdbcUrl);
 
-        if (jdbcUrl.startsWith("jdbc:postgresql://")) {
-            hikariConfig.setUsername("new_postgresql_for_javalin_user");
-            hikariConfig.setPassword("GvGwspqIZhAYD3HDJjbP9QP51RSh5yf9");
+        // Извлечение имени пользователя и пароля из переменных окружения
+        String username = System.getenv("DB_USERNAME");
+        String password = System.getenv("DB_PASSWORD");
+
+        // Проверка, что переменные окружения не пустые
+        if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
+            hikariConfig.setUsername(username);
+            hikariConfig.setPassword(password);
         }
 
         try {
