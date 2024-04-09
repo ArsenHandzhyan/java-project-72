@@ -19,7 +19,7 @@ repositories {
 dependencies {
     // Javalin and related dependencies
     implementation("io.javalin:javalin:5.6.3")
-    implementation("io.javalin:javalin-bundle:5.6.3")
+    implementation("io.javalin:javalin-bundle:5.+")
     implementation("io.javalin:javalin-rendering:5.6.3")
 
     // Thymeleaf and related dependencies
@@ -30,7 +30,7 @@ dependencies {
 
     // Database and related dependencies
     implementation 'com.h2database:h2:2.2.220'
-    implementation 'org.postgresql:postgresql:42.5.1'
+    implementation 'org.postgresql:postgresql:42.+'
     implementation 'com.zaxxer:HikariCP:5.0.1'
 
     // Ebean and related dependencies
@@ -78,7 +78,7 @@ tasks.withType(Test).configureEach {
 }
 
 compileJava {
-    options.release.set(11)
+    options.release.set(20)
 }
 
 application {
