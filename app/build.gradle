@@ -97,6 +97,7 @@ test {
         events = [TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED]
         showStandardStreams = true
     }
+    classpath = sourceSets.test.runtimeClasspath
 }
 
 jacocoTestReport {
