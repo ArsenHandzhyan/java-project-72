@@ -18,8 +18,8 @@ repositories {
 
 dependencies {
     // Javalin and related dependencies
-    implementation("io.javalin:javalin:6.1.3")
-    implementation("io.javalin:javalin-bundle:6.1.3")
+    implementation("io.javalin:javalin:5.+")
+    implementation("io.javalin:javalin-bundle:5.+")
     implementation("io.javalin:javalin-rendering:5.+")
 
     // Thymeleaf and related dependencies
