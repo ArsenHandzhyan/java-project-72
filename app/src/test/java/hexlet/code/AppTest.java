@@ -27,6 +27,7 @@ public class AppTest {
 
     @BeforeEach
     public void setUp() throws SQLException, IOException {
+        setDatabaseConnectionParams();
         app = App.getApp();
         mockWebServer = new MockWebServer();
         mockWebServer.start();
@@ -38,11 +39,42 @@ public class AppTest {
         App.stopApp(app);
     }
 
+    private void setDatabaseConnectionParams() {
+        // Установка параметров подключения к базе данных PostgreSQL
+        String jdbcUrl = "jdbc:postgresql://dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres.render.com/new_postgresql_for_javalin";
+        String username = "new_postgresql_for_javalin_user";
+        String password = "GvGwspqIZhAYD3HDJjbP9QP51RSh5yf9";
+
+        System.setProperty("JDBC_DATABASE_URL", jdbcUrl);
+        System.setProperty("DB_USERNAME", username);
+        System.setProperty("DB_PASSWORD", password);
+    }
+
     @Test
     void testH2Connection() throws SQLException {
         Connection connection = DriverManager.getConnection("jdbc:h2:mem:project");
         Assertions.assertNotNull(connection);
         connection.close();
+    }
+
+    @Test
+    void testPostgresConnection() throws SQLException {
+        String jdbcUrl = System.getProperty("JDBC_DATABASE_URL");
+        String username = System.getProperty("DB_USERNAME");
+        String password = System.getProperty("DB_PASSWORD");
+
+        if (jdbcUrl != null
+                && !jdbcUrl.isEmpty()
+                && username != null
+                && !username.isEmpty()
+                && password != null
+                && !password.isEmpty()) {
+            Connection connection = DriverManager.getConnection(jdbcUrl, username, password);
+            Assertions.assertNotNull(connection);
+            connection.close();
+        } else {
+            Assertions.fail("Database connection parameters are not set.");
+        }
     }
 
     @Test
