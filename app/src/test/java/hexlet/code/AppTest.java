@@ -41,7 +41,8 @@ public class AppTest {
 
     private void setDatabaseConnectionParams() {
         // Установка параметров подключения к базе данных PostgreSQL
-        String jdbcUrl = "jdbc:postgresql://dpg-cmuok6acn0vc73akdjfg-a.oregon-postgres.render.com/new_postgresql_for_javalin";
+        String jdbcUrl = "jdbc:postgresql://dpg-cmuok6acn0vc73akdjfg-a" +
+                ".oregon-postgres.render.com/new_postgresql_for_javalin";
         String username = "new_postgresql_for_javalin_user";
         String password = "GvGwspqIZhAYD3HDJjbP9QP51RSh5yf9";
 
