@@ -13,11 +13,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,11 +42,19 @@ public class AppTest {
     }
 
     private void setDatabaseConnectionParams() {
-        // Установка параметров подключения к базе данных PostgreSQL
-        String jdbcUrl = "jdbc:postgresql://dpg-cmuok6acn0vc73akdjfg-a" +
-                ".oregon-postgres.render.com/new_postgresql_for_javalin";
-        String username = "new_postgresql_for_javalin_user";
-        String password = "GvGwspqIZhAYD3HDJjbP9QP51RSh5yf9";
+        Properties properties = new Properties();
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("database.properties")) {
+            if (input == null) {
+                throw new IllegalArgumentException("database.properties file not found");
+            }
+            properties.load(input);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load database.properties", e);
+        }
+
+        String jdbcUrl = properties.getProperty("JDBC_DATABASE_URL");
+        String username = properties.getProperty("DB_USERNAME");
+        String password = properties.getProperty("DB_PASSWORD");
 
         System.setProperty("JDBC_DATABASE_URL", jdbcUrl);
         System.setProperty("DB_USERNAME", username);
