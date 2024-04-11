@@ -16,6 +16,10 @@ repositories {
     mavenCentral()
 }
 
+configurations.all {
+    exclude group: 'commons-collections', module: 'commons-collections'
+}
+
 dependencies {
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
