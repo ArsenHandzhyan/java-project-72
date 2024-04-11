@@ -11,12 +11,12 @@ import io.javalin.http.Context;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
-import org.apache.commons.validator.routines.DomainValidator;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -87,12 +87,7 @@ public class UrlsController {
                 return;
             }
             String inputUrl = url.getName();
-            URI uri = new URI(inputUrl);
-            if (uri.getHost() == null || !DomainValidator.getInstance().isValid(uri.getHost())) {
-                handleInvalidUrl(ctx, "Некорректный URL: отсутствует действительный хост", id);
-                return;
-            }
-            if (!isValidUrl(uri)) {
+            if (!isValidUrl(inputUrl)) {
                 handleInvalidUrl(ctx, "Некорректный URL", id);
                 return;
             }
@@ -152,6 +147,7 @@ public class UrlsController {
             return null;
         }
     }
+
     private static void handleUrlNotFound(Context ctx) {
         ctx.status(200);
         ctx.sessionAttribute("flash", "URL-адрес с указанным идентификатором не найден");
@@ -169,10 +165,16 @@ public class UrlsController {
     private static String getFirstElementText(Elements elements) {
         return elements.first() != null ? Objects.requireNonNull(elements.first()).text() : "";
     }
-    private static boolean isValidUrl(URI uri) {
-        return uri.getScheme() != null && uri.getHost() != null
-                && (uri.getScheme().equalsIgnoreCase("http")
-                || uri.getScheme().equalsIgnoreCase("https"));
+
+    private static boolean isValidUrl(String url) {
+        try {
+            URI uri = new URI(url);
+            return uri.getScheme() != null && uri.getHost() != null
+                    && (uri.getScheme().equalsIgnoreCase("http")
+                    || uri.getScheme().equalsIgnoreCase("https"));
+        } catch (URISyntaxException e) {
+            return false;
+        }
     }
 
     private static void handleInvalidUrl(Context ctx, String message, Long id) {

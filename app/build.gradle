@@ -16,10 +16,6 @@ repositories {
     mavenCentral()
 }
 
-configurations.all {
-    exclude group: 'commons-collections', module: 'commons-collections'
-}
-
 dependencies {
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
@@ -38,7 +34,6 @@ dependencies {
     implementation 'org.apache.commons:commons-text:1.11.0'
     implementation 'org.jsoup:jsoup:1.17.2'
     implementation 'org.slf4j:slf4j-simple:2.0.7'
-    implementation 'commons-validator:commons-validator:1.7'
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.1'
     implementation("com.h2database:h2:2.2.220")
@@ -53,8 +48,6 @@ dependencies {
     implementation("gg.jte:jte:3.1.6")
 
     implementation 'javax.persistence:javax.persistence-api:2.2'
-
-    implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
 }
 
 
