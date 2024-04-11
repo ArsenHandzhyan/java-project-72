@@ -30,7 +30,7 @@ public class AppTest {
     @BeforeEach
     public void setUp() throws SQLException, IOException {
         setDatabaseConnectionParams();
-        app = App.getApp();
+        app = App.getApp(); // Убедитесь, что это создает новый экземпляр для каждого теста
         mockWebServer = new MockWebServer();
         mockWebServer.start();
     }
@@ -38,7 +38,8 @@ public class AppTest {
     @AfterEach
     public void tearDown() throws IOException {
         mockWebServer.shutdown();
-        App.stopApp(app);
+        App.stopApp(app); // Убедитесь, что это останавливает текущий экземпляр после каждого теста
+        app = null; // Сбросьте экземпляр app в null, чтобы избежать его повторного использования
     }
 
     private void setDatabaseConnectionParams() {

@@ -29,7 +29,7 @@ public class App {
 
     public static void startApp() throws SQLException, IOException {
         Javalin app = getApp();
-        app.start(app.port());
+        app.start();
     }
 
     public static void stopApp(Javalin app) {
@@ -59,7 +59,7 @@ public class App {
             } catch (NumberFormatException e) {
                 LOGGER.error("Неверное значение переменной окружения PORT. Ожидалось целое число.");
             }
-        } else app.start(8080);
+        }
 
         return app;
     }
