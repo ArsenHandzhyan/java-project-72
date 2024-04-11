@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class UrlsController {
     public static void showAllUrls(Context ctx) {
@@ -94,11 +95,7 @@ public class UrlsController {
                 return;
             }
 
-            HttpResponse<String> response = sendHttpRequest(inputUrl);
-            if (response == null) {
-                handleFailedHttpRequest(ctx, url);
-                return;
-            }
+            HttpResponse<String> response = sendHttpRequest(inputUrl).orElse(handleFailedHttpRequest(ctx, url));
 
             handleSuccessfulHttpRequest(ctx, url, response);
         } catch (Exception e) {
@@ -141,11 +138,16 @@ public class UrlsController {
         ctx.redirect(NamedRoutes.urlPath(url.getId()));
     }
 
-    private static HttpResponse<String> sendHttpRequest(String url) {
+    public static Optional<HttpResponse<String>> sendHttpRequest(String url) {
         try {
-            return Unirest.get(url).asString();
+            // Выполнение GET-запроса к указанному URL
+            HttpResponse<String> response = Unirest.get(url).asString();
+            return Optional.of(response);
         } catch (UnirestException e) {
-            return null;
+            // Логирование ошибки
+            System.err.println("Ошибка при выполнении HTTP-запроса: " + e.getMessage());
+            // Возвращение пустого Optional в случае ошибки
+            return Optional.empty();
         }
     }
 
@@ -171,11 +173,12 @@ public class UrlsController {
         ctx.redirect(NamedRoutes.urlsPath());
     }
 
-    private static void handleFailedHttpRequest(Context ctx, Url url) {
+    private static HttpResponse<String> handleFailedHttpRequest(Context ctx, Url url) {
         ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
         ctx.sessionAttribute("flash", "Не удалось выполнить HTTP-запрос");
         ctx.sessionAttribute("flashType", determineFlashType(false));
         ctx.redirect(NamedRoutes.urlPath(url.getId()));
+        return null;
     }
 
     private static void handleInvalidUrl(Context ctx, String message, Long id) {
