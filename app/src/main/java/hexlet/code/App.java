@@ -29,11 +29,7 @@ public class App {
 
     public static void startApp() throws SQLException, IOException {
         Javalin app = getApp();
-        try {
-            app.start();
-        } finally {
-            stopApp(app);
-        }
+        app.start();
     }
 
     public static void stopApp(Javalin app) {
