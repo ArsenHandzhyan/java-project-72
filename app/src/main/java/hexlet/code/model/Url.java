@@ -1,6 +1,7 @@
 package hexlet.code.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class Url {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,9 +26,5 @@ public class Url {
     public Url(String name, LocalDateTime createdAt) {
         this.name = name;
         this.createdAt = createdAt;
-    }
-
-    public Url() {
-
     }
 }

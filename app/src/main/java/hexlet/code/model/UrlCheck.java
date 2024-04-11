@@ -21,7 +21,7 @@ public class UrlCheck {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "url_id") // Указываем имя столбца в базе данных
+    // Удалите аннотацию @Column, если поле urlId не используется напрямую
     private Long urlId;
 
     @ManyToOne(fetch = FetchType.LAZY)
