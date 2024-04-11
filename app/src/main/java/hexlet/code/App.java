@@ -46,6 +46,21 @@ public class App {
         TemplateEngine templateEngine = createTemplateEngine();
         Javalin app = Javalin.create(config -> config.fileRenderer(new JavalinJte(templateEngine)));
         configureRoutes(app);
+
+        // Получение значения переменной окружения PORT
+        String portEnv = System.getenv("PORT");
+        // Проверка, что переменная окружения PORT установлена
+        if (portEnv != null && !portEnv.isEmpty()) {
+            try {
+                // Попытка преобразовать значение переменной окружения в целое число
+                int port = Integer.parseInt(portEnv);
+                // Установка порта для приложения
+                app.start(port);
+            } catch (NumberFormatException e) {
+                LOGGER.error("Неверное значение переменной окружения PORT. Ожидалось целое число.");
+            }
+        } else app.start(8080);
+
         return app;
     }
 
