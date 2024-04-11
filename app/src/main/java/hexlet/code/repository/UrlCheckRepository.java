@@ -30,8 +30,8 @@ public class UrlCheckRepository {
             preparedStatement.setString(3, urlCheck.getTitle());
             preparedStatement.setString(4, urlCheck.getH1());
             preparedStatement.setString(5, urlCheck.getDescription());
-            // Преобразование LocalDateTime в Timestamp
-            Timestamp timestamp = Timestamp.valueOf(urlCheck.getCreatedAt());
+            // Автоматическое установление текущего времени и даты
+            Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
             preparedStatement.setTimestamp(6, timestamp);
             preparedStatement.executeUpdate();
         }
