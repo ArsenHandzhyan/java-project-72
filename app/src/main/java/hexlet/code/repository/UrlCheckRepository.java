@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +30,9 @@ public class UrlCheckRepository {
             preparedStatement.setString(3, urlCheck.getTitle());
             preparedStatement.setString(4, urlCheck.getH1());
             preparedStatement.setString(5, urlCheck.getDescription());
-            preparedStatement.setObject(6, urlCheck.getCreatedAt());
+            // Преобразование LocalDateTime в Timestamp
+            Timestamp timestamp = Timestamp.valueOf(urlCheck.getCreatedAt());
+            preparedStatement.setTimestamp(6, timestamp);
             preparedStatement.executeUpdate();
         }
     }
