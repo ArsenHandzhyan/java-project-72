@@ -16,10 +16,6 @@ repositories {
     mavenCentral()
 }
 
-configurations.configureEach {
-    exclude group: 'commons-collections', module: 'commons-collections'
-}
-
 dependencies {
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
@@ -54,8 +50,7 @@ dependencies {
 
     implementation 'javax.persistence:javax.persistence-api:2.2'
 
-    // Explicitly include a secure version of commons-collections
-    implementation 'commons-collections:commons-collections:4.4'
+    implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
 }
 
 
