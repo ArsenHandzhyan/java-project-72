@@ -6,6 +6,7 @@ import hexlet.code.model.Url;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
 
 import java.net.URI;
 import java.sql.SQLException;
@@ -31,6 +32,7 @@ public class MainController {
             URI uri = new URI(inputUrl);
 
             if (!isValidUrl(uri)) {
+                ctx.status(HttpStatus.OK);
                 handleInvalidUrl(ctx, "Некорректный URL");
                 return;
             }
@@ -47,6 +49,7 @@ public class MainController {
             UrlsRepository.save(url);
             handleUrlAdded(ctx);
         } catch (Exception e) {
+            ctx.status(HttpStatus.OK);
             handleInvalidUrl(ctx, "Некорректный URL: " + e.getMessage());
         }
     }
@@ -58,14 +61,14 @@ public class MainController {
     }
 
     private static void handleInvalidUrl(Context ctx, String message) {
-        ctx.status(200);
+        ctx.status(HttpStatus.OK);
         ctx.sessionAttribute("flash", message);
         ctx.sessionAttribute("flashType", determineFlashType(false));
         ctx.redirect(NamedRoutes.homePath());
     }
 
     private static void handleExistingUrl(Context ctx) throws SQLException {
-        ctx.status(200);
+        ctx.status(HttpStatus.OK);
         ctx.sessionAttribute("flash", "Страница уже существует");
         ctx.sessionAttribute("flashType", determineFlashType(true));
         List<Url> urls = UrlsRepository.getEntities();
@@ -73,7 +76,7 @@ public class MainController {
     }
 
     private static void handleUrlAdded(Context ctx) throws SQLException {
-        ctx.status(200);
+        ctx.status(HttpStatus.OK);
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flashType", determineFlashType(true));
         List<Url> urls = UrlsRepository.getEntities();
@@ -81,6 +84,7 @@ public class MainController {
     }
 
     private static void renderUrlsPage(Context ctx, List<Url> urls) {
+        ctx.status(HttpStatus.OK);
         var flash = ctx.consumeSessionAttribute("flash");
         var flashType = ctx.consumeSessionAttribute("flashType");
         ctx.attribute("urls", urls);

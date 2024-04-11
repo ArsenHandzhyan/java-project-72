@@ -67,7 +67,7 @@ public class App {
     private static void configureRoutes(Javalin app) {
         app.get(NamedRoutes.homePath(), MainController::index);
         app.get(NamedRoutes.urlsPath(), UrlsController::showAllUrls);
-        app.post(NamedRoutes.homePath(), MainController::addUrl);
+        app.post(NamedRoutes.urlsPath(), MainController::addUrl);
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::showUrlById);
         app.get(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);
         app.post(NamedRoutes.checksUrlPath("{id}"), UrlsController::checkUrl);

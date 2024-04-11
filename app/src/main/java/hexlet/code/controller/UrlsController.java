@@ -135,7 +135,6 @@ public class UrlsController {
         urlCheck.setH1(h1);
         urlCheck.setDescription(description);
         UrlCheckRepository.save(urlCheck);
-
         ctx.status(200);
         ctx.sessionAttribute("flash", "URL успешно проверен");
         ctx.sessionAttribute("flashType", determineFlashType(true));
@@ -148,20 +147,6 @@ public class UrlsController {
         } catch (UnirestException e) {
             return null;
         }
-    }
-
-    private static void handleUrlNotFound(Context ctx) {
-        ctx.status(200);
-        ctx.sessionAttribute("flash", "URL-адрес с указанным идентификатором не найден");
-        ctx.sessionAttribute("flashType", determineFlashType(false));
-        ctx.redirect(NamedRoutes.urlsPath());
-    }
-
-    private static void handleFailedHttpRequest(Context ctx, Url url) {
-        ctx.status(500);
-        ctx.sessionAttribute("flash", "Не удалось выполнить HTTP-запрос");
-        ctx.sessionAttribute("flashType", determineFlashType(false));
-        ctx.redirect(NamedRoutes.urlPath(url.getId()));
     }
 
     private static String getFirstElementText(Elements elements) {
@@ -179,8 +164,22 @@ public class UrlsController {
         }
     }
 
+    private static void handleUrlNotFound(Context ctx) {
+        ctx.status(HttpStatus.NOT_FOUND);
+        ctx.sessionAttribute("flash", "URL-адрес с указанным идентификатором не найден");
+        ctx.sessionAttribute("flashType", determineFlashType(false));
+        ctx.redirect(NamedRoutes.urlsPath());
+    }
+
+    private static void handleFailedHttpRequest(Context ctx, Url url) {
+        ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+        ctx.sessionAttribute("flash", "Не удалось выполнить HTTP-запрос");
+        ctx.sessionAttribute("flashType", determineFlashType(false));
+        ctx.redirect(NamedRoutes.urlPath(url.getId()));
+    }
+
     private static void handleInvalidUrl(Context ctx, String message, Long id) {
-        ctx.status(200);
+        ctx.status(HttpStatus.BAD_REQUEST);
         ctx.sessionAttribute("flash", message);
         ctx.sessionAttribute("flashType", determineFlashType(false));
         ctx.redirect(NamedRoutes.urlPath(id));
