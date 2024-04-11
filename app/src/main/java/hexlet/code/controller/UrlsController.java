@@ -8,6 +8,7 @@ import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
@@ -48,6 +49,7 @@ public class UrlsController {
                 ctx.attribute("url", url);
                 getPage(ctx, url, urlChecks);
             } else {
+                ctx.status(HttpStatus.NOT_FOUND);
                 ctx.sessionAttribute("flash", "URL с указанным ID не найден");
                 ctx.sessionAttribute("flashType", determineFlashType(false));
                 List<Url> urls = UrlsRepository.getEntities();

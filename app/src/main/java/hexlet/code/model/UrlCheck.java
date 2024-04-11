@@ -20,10 +20,12 @@ public class UrlCheck {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "url_id") // Указываем имя столбца в базе данных
     private Long urlId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "url_id")
+    @JoinColumn(name = "url_id") // Указываем имя столбца в базе данных
     private Url url;
 
     private Integer statusCode;
