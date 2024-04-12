@@ -25,23 +25,38 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * This class is designed for extension. To safely extend this class, override the methods
+ * as needed, but be aware of the potential impact on the existing functionality.
+ */
 public class AppTest {
     private Javalin app;
     private MockWebServer mockWebServer;
 
+    /**
+     * Sets up the test environment before each test.
+     *
+     * @throws SQLException if there is an error setting up the database connection
+     * @throws IOException  if there is an error loading the database properties
+     */
     @BeforeEach
     public void setUp() throws SQLException, IOException {
         setDatabaseConnectionParams();
-        app = App.getApp();
+        app = App.getApp(); // Ensure this creates a new instance for each test
         mockWebServer = new MockWebServer();
         mockWebServer.start();
     }
 
+    /**
+     * Tears down the test environment after each test.
+     *
+     * @throws IOException if there is an error shutting down the mock web server
+     */
     @AfterEach
     public void tearDown() throws IOException {
         mockWebServer.shutdown();
-        App.stopApp(app);
-        app = null;
+        App.stopApp(app); // Ensure this stops the current instance after each test
+        app = null; // Reset the app instance to avoid reuse
     }
 
     private void setDatabaseConnectionParams() {
