@@ -63,24 +63,20 @@ public class MainController {
     }
 
     private static void handleInvalidUrl(Context ctx, String message) {
-        ctx.status(HttpStatus.BAD_REQUEST);
-        ctx.sessionAttribute("flash", message);
-        ctx.sessionAttribute("flashType", determineFlashType(false));
+        setFlashAndRedirect(ctx, message, false);
         ctx.redirect(NamedRoutes.homePath());
     }
 
     private static void handleExistingUrl(Context ctx) throws SQLException {
         ctx.status(HttpStatus.CONFLICT);
-        ctx.sessionAttribute("flash", "Страница уже существует");
-        ctx.sessionAttribute("flashType", determineFlashType(true));
+        setFlashAndRedirect(ctx, "Страница уже существует", true);
         List<Url> urls = UrlsRepository.getEntities();
         renderUrlsPage(ctx, urls);
     }
 
     private static void handleUrlAdded(Context ctx) throws SQLException {
         ctx.status(HttpStatus.OK);
-        ctx.sessionAttribute("flash", "Страница успешно добавлена");
-        ctx.sessionAttribute("flashType", determineFlashType(true));
+        setFlashAndRedirect(ctx, "Страница успешно добавлена", true);
         List<Url> urls = UrlsRepository.getEntities();
         renderUrlsPage(ctx, urls);
     }
@@ -98,5 +94,11 @@ public class MainController {
 
     private static String determineFlashType(boolean isSuccess) {
         return isSuccess ? "alert-success" : "alert-danger";
+    }
+
+    private static void setFlashAndRedirect(Context ctx, String message, boolean isSuccess) {
+        ctx.sessionAttribute("flash", message);
+        ctx.sessionAttribute("flashType", determineFlashType(isSuccess));
+        ctx.redirect(NamedRoutes.homePath());
     }
 }
