@@ -1,6 +1,8 @@
 package hexlet.code;
 
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
+import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlsRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
@@ -23,38 +25,23 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * This class is designed for extension. To safely extend this class, override the methods
- * as needed, but be aware of the potential impact on the existing functionality.
- */
 public class AppTest {
     private Javalin app;
     private MockWebServer mockWebServer;
 
-    /**
-     * Sets up the test environment before each test.
-     *
-     * @throws SQLException if there is an error setting up the database connection
-     * @throws IOException  if there is an error loading the database properties
-     */
     @BeforeEach
     public void setUp() throws SQLException, IOException {
         setDatabaseConnectionParams();
-        app = App.getApp(); // Ensure this creates a new instance for each test
+        app = App.getApp();
         mockWebServer = new MockWebServer();
         mockWebServer.start();
     }
 
-    /**
-     * Tears down the test environment after each test.
-     *
-     * @throws IOException if there is an error shutting down the mock web server
-     */
     @AfterEach
     public void tearDown() throws IOException {
         mockWebServer.shutdown();
-        App.stopApp(app); // Ensure this stops the current instance after each test
-        app = null; // Reset the app instance to avoid reuse
+        App.stopApp(app);
+        app = null;
     }
 
     private void setDatabaseConnectionParams() {
@@ -229,4 +216,43 @@ public class AppTest {
             assertThat(response.code()).isEqualTo(200);
         });
     }
+
+    @Test
+    void testCheckUrlSuccess() throws SQLException {
+        var url = new Url("https://example.com", LocalDateTime.now());
+        UrlsRepository.save(url);
+        mockWebServer.enqueue(new MockResponse().setBody("<html><head><title>Test Title</title></head><body><h1>Test "
+                + "H1</h1><meta name=\"description\" content=\"Test Description\"></body></html>"));
+
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.post(NamedRoutes.checksUrlPath(url.getId()));
+            assertThat(response.code()).isEqualTo(200); // Используйте status вместо code
+            // Проверка, что информация о проверке URL была сохранена в базе данных
+            var urlCheck = UrlCheckRepository.findByUrlId(url.getId());
+            assertThat(urlCheck).isNotNull();
+            assertThat(urlCheck.get(Math.toIntExact(url.getId() - 1))
+                    .getTitle()).isEqualTo("Example Domain");
+        });
+    }
+
+    @Test
+    void testDisplayUrlCheckInfo() throws SQLException {
+        var url = new Url("https://example.com", LocalDateTime.now());
+        UrlsRepository.save(url);
+        // Предположим, что мы уже добавили проверку для этого URL и сохранили информацию в базе данных
+        var urlCheck = new UrlCheck();
+        urlCheck.setStatusCode(200);
+        urlCheck.setDescription("Test Description");
+        urlCheck.setUrl(url); // Установка связанного объекта Url
+        UrlCheckRepository.save(urlCheck); // Предполагается, что у вас есть метод для сохранения проверки
+
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.get("/urls/" + url.getId());
+            assertThat(response.code()).isEqualTo(200); // Используйте status вместо code
+            assert response.body() != null;
+            // Проверка наличия информации о проверке в ответе
+            assertThat(response.body().string()).contains("Test Description");
+        });
+    }
+
 }
