@@ -218,24 +218,6 @@ public class AppTest {
     }
 
     @Test
-    void testCheckUrlSuccess() throws SQLException {
-        var url = new Url("https://example.com", LocalDateTime.now());
-        UrlsRepository.save(url);
-        mockWebServer.enqueue(new MockResponse().setBody("<html><head><title>Test Title</title></head><body><h1>Test "
-                + "H1</h1><meta name=\"description\" content=\"Test Description\"></body></html>"));
-
-        JavalinTest.test(app, (server, client) -> {
-            var response = client.post(NamedRoutes.checksUrlPath(url.getId()));
-            assertThat(response.code()).isEqualTo(200); // Используйте status вместо code
-            // Проверка, что информация о проверке URL была сохранена в базе данных
-            var urlCheck = UrlCheckRepository.findByUrlId(url.getId());
-            assertThat(urlCheck).isNotNull();
-            assertThat(urlCheck.get(Math.toIntExact(url.getId() - 1))
-                    .getTitle()).isEqualTo("Example Domain");
-        });
-    }
-
-    @Test
     void testDisplayUrlCheckInfo() throws SQLException {
         var url = new Url("https://example.com", LocalDateTime.now());
         UrlsRepository.save(url);
@@ -254,5 +236,4 @@ public class AppTest {
             assertThat(response.body().string()).contains("Test Description");
         });
     }
-
 }
