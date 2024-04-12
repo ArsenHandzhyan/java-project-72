@@ -9,6 +9,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class is designed for extension. To safely extend this class, override the methods
+ * as needed, but be aware of the potential impact on the existing functionality.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -18,11 +22,21 @@ public class BuildUrlPage extends BasePage {
     public LocalDateTime createdAt;
     public Map<String, List<ValidationError<Object>>> errors;
 
+    /**
+     * Gets the flash message.
+     *
+     * @return the flash message
+     */
     @Override
     public String getFlash() {
         return super.getFlash();
     }
 
+    /**
+     * Sets the flash message.
+     *
+     * @param flash the flash message to set
+     */
     @Override
     public void setFlash(String flash) {
         super.setFlash(flash);

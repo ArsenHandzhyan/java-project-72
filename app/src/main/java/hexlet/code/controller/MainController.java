@@ -32,7 +32,7 @@ public class MainController {
             URI uri = new URI(inputUrl);
 
             if (!isValidUrl(uri)) {
-                ctx.status(HttpStatus.OK);
+                ctx.status(HttpStatus.BAD_REQUEST);
                 handleInvalidUrl(ctx, "Некорректный URL");
                 return;
             }
@@ -42,14 +42,16 @@ public class MainController {
             }
             Optional<Url> existingUrl = UrlsRepository.findUrlByUrl(domainWithProtocolAndPort);
             if (existingUrl.isPresent()) {
+                ctx.status(HttpStatus.CONFLICT);
                 handleExistingUrl(ctx);
                 return;
             }
             Url url = new Url(domainWithProtocolAndPort, LocalDateTime.now());
             UrlsRepository.save(url);
+            ctx.status(HttpStatus.CREATED);
             handleUrlAdded(ctx);
         } catch (Exception e) {
-            ctx.status(HttpStatus.OK);
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             handleInvalidUrl(ctx, "Некорректный URL: " + e.getMessage());
         }
     }
@@ -61,14 +63,14 @@ public class MainController {
     }
 
     private static void handleInvalidUrl(Context ctx, String message) {
-        ctx.status(HttpStatus.OK);
+        ctx.status(HttpStatus.BAD_REQUEST);
         ctx.sessionAttribute("flash", message);
         ctx.sessionAttribute("flashType", determineFlashType(false));
         ctx.redirect(NamedRoutes.homePath());
     }
 
     private static void handleExistingUrl(Context ctx) throws SQLException {
-        ctx.status(HttpStatus.OK);
+        ctx.status(HttpStatus.CONFLICT);
         ctx.sessionAttribute("flash", "Страница уже существует");
         ctx.sessionAttribute("flashType", determineFlashType(true));
         List<Url> urls = UrlsRepository.getEntities();

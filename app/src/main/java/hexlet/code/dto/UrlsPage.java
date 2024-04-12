@@ -6,16 +6,30 @@ import lombok.Getter;
 
 import java.util.List;
 
+/**
+ * This class is designed for extension. To safely extend this class, override the methods
+ * as needed, but be aware of the potential impact on the existing functionality.
+ */
 @AllArgsConstructor
 @Getter
 public class UrlsPage extends BasePage {
     private List<Url> urls;
 
+    /**
+     * Gets the flash message.
+     *
+     * @return the flash message
+     */
     @Override
     public String getFlash() {
         return super.getFlash();
     }
 
+    /**
+     * Sets the flash message.
+     *
+     * @param flash the flash message to set
+     */
     @Override
     public void setFlash(String flash) {
         super.setFlash(flash);
