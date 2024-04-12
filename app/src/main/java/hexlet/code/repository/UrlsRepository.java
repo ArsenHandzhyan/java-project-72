@@ -13,7 +13,7 @@ import static hexlet.code.repository.BaseRepository.dataSource;
 
 public class UrlsRepository extends UrlHelper {
     public static void save(Url url) throws SQLException {
-        String sql = "INSERT INTO urls (name) VALUES (?)";
+        String sql = "INSERT INTO urls (name, created_at) VALUES (?, NOW())";
         try (var conn = dataSource.getConnection();
              var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, UrlHelper.normalizeUrl(url.getName()));
@@ -35,7 +35,8 @@ public class UrlsRepository extends UrlHelper {
             var resultSet = stmt.executeQuery();
             if (resultSet.next()) {
                 var name = resultSet.getString("name");
-                var url = new Url(name, LocalDateTime.now());
+                var createdAt = resultSet.getObject("created_at", LocalDateTime.class);
+                var url = new Url(name, createdAt);
                 url.setId(id);
                 return Optional.of(url);
             }
@@ -52,7 +53,8 @@ public class UrlsRepository extends UrlHelper {
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
-                var url = new Url(name, LocalDateTime.now());
+                var createdAt = resultSet.getObject("created_at", LocalDateTime.class);
+                var url = new Url(name, createdAt);
                 url.setId(id);
                 result.add(url);
             }
@@ -69,7 +71,8 @@ public class UrlsRepository extends UrlHelper {
             if (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
-                var urlObject = new Url(name, LocalDateTime.now());
+                var createdAt = resultSet.getObject("created_at", LocalDateTime.class);
+                var urlObject = new Url(name, createdAt);
                 urlObject.setId(id);
                 return Optional.of(urlObject);
             }
