@@ -47,14 +47,10 @@ public class App {
         Javalin app = Javalin.create(config -> config.fileRenderer(new JavalinJte(templateEngine)));
         configureRoutes(app);
 
-        // Получение значения переменной окружения PORT
         String portEnv = System.getenv("PORT");
-        // Проверка, что переменная окружения PORT установлена
         if (portEnv != null && !portEnv.isEmpty()) {
             try {
-                // Попытка преобразовать значение переменной окружения в целое число
                 int port = Integer.parseInt(portEnv);
-                // Установка порта для приложения
                 app.start(port);
             } catch (NumberFormatException e) {
                 LOGGER.error("Неверное значение переменной окружения PORT. Ожидалось целое число.");
@@ -82,11 +78,9 @@ public class App {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(jdbcUrl);
 
-        // Извлечение имени пользователя и пароля из переменных окружения
         String username = System.getenv("DB_USERNAME");
         String password = System.getenv("DB_PASSWORD");
 
-        // Проверка, что переменные окружения не пустые
         if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
             hikariConfig.setUsername(username);
             hikariConfig.setPassword(password);

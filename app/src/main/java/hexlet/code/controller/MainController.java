@@ -30,7 +30,6 @@ public class MainController {
         try {
             assert inputUrl != null;
             URI uri = new URI(inputUrl);
-
             if (!isValidUrl(uri)) {
                 ctx.status(HttpStatus.BAD_REQUEST);
                 handleInvalidUrl(ctx, "Некорректный URL");

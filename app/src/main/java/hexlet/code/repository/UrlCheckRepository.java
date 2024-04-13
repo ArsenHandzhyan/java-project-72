@@ -47,19 +47,6 @@ public class UrlCheckRepository {
         }
     }
 
-    public static long getNextIdForUrl(long urlId) throws SQLException {
-        String sql = "SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM url_checks WHERE url_id = ?";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-            preparedStatement.setLong(1, urlId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getLong("next_id");
-            }
-            return 1;
-        }
-    }
-
     public static UrlCheck findLastByUrlId(Long urlId) {
         String sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY created_at DESC LIMIT 1";
         try (Connection conn = dataSource.getConnection();

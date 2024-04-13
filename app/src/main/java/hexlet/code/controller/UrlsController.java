@@ -93,9 +93,7 @@ public class UrlsController {
                 handleInvalidUrl(ctx, "Некорректный URL", id);
                 return;
             }
-
             HttpResponse<String> response = sendHttpRequest(inputUrl).orElse(handleFailedHttpRequest(ctx, url));
-
             handleSuccessfulHttpRequest(ctx, url, response);
         } catch (Exception e) {
             handleInvalidUrl(ctx, "Некорректный URL: " + e.getMessage(), id);
@@ -120,17 +118,13 @@ public class UrlsController {
             h1 = getFirstElementText(document.select("h1"));
             description = document.select("meta[name=description]").attr("content");
         }
-        long urlCheckId = UrlCheckRepository.getNextIdForUrl(url.getId());
         UrlCheck urlCheck = new UrlCheck();
         urlCheck.setUrl(url);
-        urlCheck.setId(urlCheckId);
         urlCheck.setUrlId(url.getId());
         urlCheck.setStatusCode(statusCode);
-        // Установка title, h1 и description
         urlCheck.setTitle(title);
         urlCheck.setH1(h1);
         urlCheck.setDescription(description);
-        // Сохранение объекта UrlCheck, в котором created_at будет установлен автоматически
         UrlCheckRepository.save(urlCheck);
         ctx.status(200);
         ctx.sessionAttribute("flash", "URL успешно проверен");
@@ -140,13 +134,10 @@ public class UrlsController {
 
     public static Optional<HttpResponse<String>> sendHttpRequest(String url) {
         try {
-            // Выполнение GET-запроса к указанному URL
             HttpResponse<String> response = Unirest.get(url).asString();
             return Optional.of(response);
         } catch (UnirestException e) {
-            // Логирование ошибки
             System.err.println("Ошибка при выполнении HTTP-запроса: " + e.getMessage());
-            // Возвращение пустого Optional в случае ошибки
             return Optional.empty();
         }
     }
