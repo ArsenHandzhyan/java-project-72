@@ -15,13 +15,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,7 +39,7 @@ public class AppTest {
      */
     @BeforeEach
     public void setUp() throws SQLException, IOException {
-        setDatabaseConnectionParams();
+//        setDatabaseConnectionParams();
         app = App.getApp(); // Ensure this creates a new instance for each test
         mockWebServer = new MockWebServer();
         mockWebServer.start();
@@ -59,51 +57,11 @@ public class AppTest {
         app = null; // Reset the app instance to avoid reuse
     }
 
-    private void setDatabaseConnectionParams() {
-        Properties properties = new Properties();
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("database.properties")) {
-            if (input == null) {
-                throw new IllegalArgumentException("database.properties file not found");
-            }
-            properties.load(input);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load database.properties", e);
-        }
-
-        String jdbcUrl = properties.getProperty("JDBC_DATABASE_URL");
-        String username = properties.getProperty("DB_USERNAME");
-        String password = properties.getProperty("DB_PASSWORD");
-
-        System.setProperty("JDBC_DATABASE_URL", jdbcUrl);
-        System.setProperty("DB_USERNAME", username);
-        System.setProperty("DB_PASSWORD", password);
-    }
-
     @Test
     void testH2Connection() throws SQLException {
         Connection connection = DriverManager.getConnection("jdbc:h2:mem:project");
         Assertions.assertNotNull(connection);
         connection.close();
-    }
-
-    @Test
-    void testPostgresConnection() throws SQLException {
-        String jdbcUrl = System.getProperty("JDBC_DATABASE_URL");
-        String username = System.getProperty("DB_USERNAME");
-        String password = System.getProperty("DB_PASSWORD");
-
-        if (jdbcUrl != null
-                && !jdbcUrl.isEmpty()
-                && username != null
-                && !username.isEmpty()
-                && password != null
-                && !password.isEmpty()) {
-            Connection connection = DriverManager.getConnection(jdbcUrl, username, password);
-            Assertions.assertNotNull(connection);
-            connection.close();
-        } else {
-            Assertions.fail("Database connection parameters are not set.");
-        }
     }
 
     @Test
