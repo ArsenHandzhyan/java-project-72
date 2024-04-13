@@ -9,7 +9,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
@@ -24,7 +23,6 @@ public class UrlCheck {
     private Long urlId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "url_id")
     private Url url;
 
     private Integer statusCode;
