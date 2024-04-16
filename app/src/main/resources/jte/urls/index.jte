@@ -35,9 +35,8 @@ content = @`
                     <td>${url.getId()}</td>
                     <td><a href="${NamedRoutes.urlsPath()}/${url.getId()}">${url.getName()}</a></td>
                     @if (UrlCheckRepository.findLastByUrlId(url.getId()) != null)
-                        <td>${page.getLastCheckDate(url.getId())
-.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))}</td>
-                        <td>${page.getStatusCode(url.getId())}</td>
+                        <td>${url.getLastCheckDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))}</td>
+                        <td>${url.getStatusCode()}</td>
                     @else
                         <td colspan="2">No check available</td>
                     @endif
