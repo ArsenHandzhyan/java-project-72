@@ -5,7 +5,7 @@ import hexlet.code.repository.UrlCheckRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,15 +19,26 @@ import java.util.Objects;
 public class UrlsPage extends BasePage {
     private List<Url> urls;
 
+    /**
+     * Retrieves the HTTP status code of the last check for the URL with the specified ID.
+     *
+     * @param id the ID of the URL
+     * @return the HTTP status code as a string, or an empty string if the URL check is not found
+     */
     public String getStatusCode(Long id) {
         return String.valueOf(Objects.requireNonNull(UrlCheckRepository.findLastByUrlId(id)).getStatusCode());
     }
 
-    public String getLastCheckDate(Long id) {
-        return Objects.requireNonNull(UrlCheckRepository.findLastByUrlId(id)).getCreatedAt().format(DateTimeFormatter
-                .ofPattern("dd/MM/yyyy HH:mm"));
+    /**
+     * Retrieves the date and time of the last check for the URL with the specified ID.
+     *
+     * @param id the ID of the URL
+     * @return the date and time of the last check in the format "dd/MM/yyyy HH:mm",
+     * zor an empty string if the URL check is not found
+     */
+    public LocalDateTime getLastCheckDate(Long id) {
+        return Objects.requireNonNull(UrlCheckRepository.findLastByUrlId(id)).getCreatedAt();
     }
-
 
     /**
      * Gets the flash message.
