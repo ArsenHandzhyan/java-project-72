@@ -7,9 +7,8 @@ import lombok.Getter;
 import java.util.List;
 
 /**
- * This class represents a page of URLs with additional information about the last check date and status code.
- * It is designed for extension. To safely extend this class, override the methods as needed, but be aware of the
- * potential impact on the existing functionality.
+ * This class is designed for extension. To safely extend this class, override the methods
+ * as needed, but be aware of the potential impact on the existing functionality.
  */
 @AllArgsConstructor
 @Getter
