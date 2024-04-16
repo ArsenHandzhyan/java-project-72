@@ -29,7 +29,7 @@ public class UrlsController {
         try {
             List<Url> urls = UrlsRepository.getEntities();
             ctx.attribute("urls", urls);
-            var page = new UrlsPage(urls, null, null);
+            var page = new UrlsPage(urls);
             ctx.render("urls/index.jte", Collections.singletonMap("page", page));
         } catch (SQLException e) {
             ctx.status(500);
@@ -39,31 +39,35 @@ public class UrlsController {
         }
     }
 
-    public static void showUrlById(Context ctx) {
+    public static void showUrlById(Context ctx) throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         try {
             Url url = UrlsRepository.find(id).orElse(null);
-            if (url == null) {
+            List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(id);
+            ctx.status(200);
+            if (url != null) {
+                ctx.attribute("url", url);
+                getPage(ctx, url, urlChecks);
+            } else {
                 ctx.status(HttpStatus.NOT_FOUND);
                 ctx.sessionAttribute("flash", "URL с указанным ID не найден");
                 ctx.sessionAttribute("flashType", determineFlashType(false));
                 List<Url> urls = UrlsRepository.getEntities();
-                var page = new UrlsPage(urls, null, null);
+                var page = new UrlsPage(urls);
                 var flash = ctx.consumeSessionAttribute("flash");
                 var flashType = ctx.consumeSessionAttribute("flashType");
                 page.setFlash((String) flash);
                 page.setFlashType((String) flashType);
                 ctx.render("urls/index.jte", Collections.singletonMap("page", page));
-                return;
             }
-            List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(id);
-            ctx.status(200);
-            getPage(ctx, url, urlChecks);
         } catch (SQLException e) {
+            id = ctx.pathParamAsClass("id", Long.class).get();
+            Url url = UrlsRepository.find(id).orElse(null);
+            List<UrlCheck> urlChecks = UrlCheckRepository.findByUrlId(id);
             ctx.status(500);
             ctx.sessionAttribute("flash", "Произошла ошибка при получении URL по ID");
             ctx.sessionAttribute("flashType", determineFlashType(false));
-            ctx.redirect(NamedRoutes.urlsPath());
+            getPage(ctx, url, urlChecks);
         }
     }
 

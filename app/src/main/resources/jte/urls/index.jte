@@ -1,5 +1,6 @@
 @import hexlet.code.dto.UrlsPage
 @import hexlet.code.util.NamedRoutes
+@import hexlet.code.repository.UrlCheckRepository
 
 @param UrlsPage page
 
@@ -28,12 +29,16 @@ content = @`
         </thead>
         <tbody>
         @if (page != null && !page.getUrls().isEmpty())
-            @for(var urlPage : page.getUrls())
+            @for(var url : page.getUrls())
                 <tr>
-                    <td>${urlPage.getId()}</td>
-                    <td><a href="${NamedRoutes.urlsPath()}/${urlPage.getId()}">${urlPage.getName()}</a></td>
-                    <td>${String.valueOf(page.getLastCheckDate())}</td>
-                    <td>${page.getStatusCode()}</td>
+                    <td>${url.getId()}</td>
+                    <td><a href="${NamedRoutes.urlsPath()}/${url.getId()}">${url.getName()}</a></td>
+                    @if (UrlCheckRepository.findLastByUrlId(url.getId()) != null)
+                        <td>${page.getLastCheckDate(url.getId())}</td>
+                        <td>${page.getStatusCode(url.getId())}</td>
+                    @else
+                        <td colspan="2">No check available</td>
+                    @endif
                 </tr>
             @endfor
         @else
