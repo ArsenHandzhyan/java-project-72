@@ -1,7 +1,5 @@
 @import hexlet.code.dto.UrlsPage
 @import hexlet.code.util.NamedRoutes
-@import java.time.format.DateTimeFormatter
-@import hexlet.code.repository.UrlCheckRepository
 
 @param UrlsPage page
 
@@ -30,18 +28,12 @@ content = @`
         </thead>
         <tbody>
         @if (page != null && !page.getUrls().isEmpty())
-            @for(var url : page.getUrls())
+            @for(var urlPage : page.getUrls())
                 <tr>
-                    <td>${url.getId()}</td>
-                    <td><a href="${NamedRoutes.urlsPath()}/${url.getId()}">${url.getName()}</a></td>
-                    @if (UrlCheckRepository.findLastByUrlId(url.getId()) != null)
-                        <td>${UrlCheckRepository.findLastByUrlId(url.getId())
-                        .getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))}</td>
-                        <td>${UrlCheckRepository.findLastByUrlId(url.getId())
-                        .getStatusCode()}</td>
-                    @else
-                        <td colspan="2">No check available</td>
-                    @endif
+                    <td>${urlPage.getId()}</td>
+                    <td><a href="${NamedRoutes.urlsPath()}/${urlPage.getId()}">${urlPage.getName()}</a></td>
+                    <td>${String.valueOf(page.getLastCheckDate())}</td>
+                    <td>${page.getStatusCode()}</td>
                 </tr>
             @endfor
         @else

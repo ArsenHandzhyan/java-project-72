@@ -85,7 +85,7 @@ public class MainController {
         var flash = ctx.consumeSessionAttribute("flash");
         var flashType = ctx.consumeSessionAttribute("flashType");
         ctx.attribute("urls", urls);
-        var page = new UrlsPage(urls);
+        var page = new UrlsPage(urls, null, null);
         page.setFlash((String) flash);
         page.setFlashType((String) flashType);
         ctx.render("urls/index.jte", Collections.singletonMap("page", page));
