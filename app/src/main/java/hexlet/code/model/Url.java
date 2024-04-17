@@ -34,12 +34,6 @@ public class Url {
         return lastCheck != null ? String.valueOf(lastCheck.getStatusCode()) : "";
     }
 
-    /**
-     * Retrieves the date and time of the last check.
-     *
-     * @return the date and time of the last check in the format "dd/MM/yyyy HH:mm",
-     * or an empty string if the URL check is not found
-     */
     public LocalDateTime getLastCheckDate() {
         UrlCheck lastCheck = UrlCheckRepository.findLastByUrlId(this.id);
         return lastCheck != null ? lastCheck.getCreatedAt() : null;
