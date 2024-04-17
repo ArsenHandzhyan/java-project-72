@@ -22,6 +22,8 @@ public class Url {
     private Long id;
     private String name;
     private LocalDateTime createdAt;
+    private LocalDateTime lastCheckDate;
+    private Integer lastCheckStatusCode;
 
     public Url(String name, LocalDateTime createdAt) {
         this.name = name;

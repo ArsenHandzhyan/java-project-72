@@ -19,6 +19,7 @@ import org.jsoup.select.Elements;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -118,6 +119,9 @@ public class UrlsController {
             h1 = getFirstElementText(document.select("h1"));
             description = document.select("meta[name=description]").attr("content");
         }
+        url.setLastCheckDate(LocalDateTime.now());
+        url.setLastCheckStatusCode(statusCode);
+        UrlsRepository.save(url);
         UrlCheck urlCheck = new UrlCheck();
         urlCheck.setUrl(url);
         urlCheck.setUrlId(url.getId());
